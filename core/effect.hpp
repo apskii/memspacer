@@ -6,10 +6,12 @@
 
 struct GameObject;
 
-TPL(T) struct Effect {
+static Pool* implicit_effect_pool;
+
+TPL(T) struct Effect {    
     static_assert(std::is_base_of<GameObject, T>::value,
-        "T <: GameObject required in Effect<T>"
-    );
+        "T <: GameObject required in Effect<T>."
+    );    
     virt is_expired()     const -> bool = 0;
     virt apply(T&, float) const -> void = 0;
     virt update(float)          -> void = 0;

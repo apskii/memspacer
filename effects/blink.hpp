@@ -25,8 +25,8 @@ TPL(Colored) struct Blink : public Effect<Colored> {
 
 CHECK_EFFECT(Blink, Blink<Cell>);
 
-TPL(Colored) func blink(float duration, Vec4 color, Pool& pool) -> WrapEffectTerm<Colored> {
-    return WrapEffectTerm<Colored>(new (pool.malloc()) Blink<Colored>(duration, color));
+TPL(Colored) func blink(float duration, Vec4 color, Pool* pool = implicit_effect_pool) -> WrapEffectTerm<Colored> {
+    return WrapEffectTerm<Colored>(new (pool->malloc()) Blink<Colored>(duration, color));
 }
 
 #endif EFFECTS_BLINK_HPP

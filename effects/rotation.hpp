@@ -1,8 +1,6 @@
 #ifndef EFFECTS_ROTATION_HPP
 #define EFFECTS_ROTATION_HPP
 
-// #include <glm/gtx/quaternion.hpp>
-// #include <glm/gtc/quaternion.hpp>
 #include "../core/defs.hpp"
 #include "../core/effect.hpp"
 
@@ -23,5 +21,9 @@ TPL(Oriented) struct Rotation : public Effect<Oriented> {
         duration -= delta;
     }
 };
+
+TPL(Oriented) func rotation(float duration, Quat orientation, Pool* pool = implicit_effect_pool) -> WrapEffectTerm<Oriented> {
+    return WrapEffectTerm<Oriented>(new (pool->malloc()) Rotation<Oriented>(duration, orientation));
+}
 
 #endif EFFECTS_ROTATION_HPP

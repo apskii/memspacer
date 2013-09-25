@@ -10,7 +10,7 @@
 TPL_2(ET1, ET2) struct SeqEffectTerm;
 TPL_2(ET1, ET2) struct ParEffectTerm;
 
-TPL_2(Self, T) struct EffectTerm {
+TPL_2(Self, T) struct EffectTerm {    
     typedef T EffectTarget;
     TPL(ET) meth operator>>(ET other) -> inline SeqEffectTerm<Self, ET> {
         return SeqEffectTerm<Self, ET>(*((Self*) this), other);
@@ -56,7 +56,9 @@ TPL_2(ET1, ET2) struct ParEffectTerm
 
 struct EffectAlgebra {
     Pool& effect_pool;
-    EffectAlgebra(Pool& effect_pool) : effect_pool(effect_pool) {}
+    EffectAlgebra(Pool& effect_pool = *implicit_effect_pool)
+        : effect_pool(effect_pool)
+    {}
     TPL(ET) meth eval(ET term) -> inline Effect<typename ET::EffectTarget>* {
         return term.eval(effect_pool);
     }
