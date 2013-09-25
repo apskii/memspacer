@@ -3,6 +3,8 @@
 
 #include "../core/game_object.hpp"
 #include "cell.hpp"
+#include "../effects/blink.hpp"
+#include "../effects/rotation.hpp"
 
 class Cube : public GameObjectTemplate<Cube> {
 private:
@@ -23,14 +25,23 @@ public:
                             position.y + y * dp,
                             position.z + z * dp
                         },
-                        Quat { 0, 0, 0, 0 }
+                        glm::angleAxis(0.f, 0.f, 0.f, 1.f)
+                        // Quat(Vec3(1.57f, 1.57f, 0.f))
                     );
+                    cells[x][y][z].add_effect(new Rotation<Cell>(4., glm::angleAxis(90.f, 0.f, 0.f, 1.f)));
                 }
     }
     virt draw() -> void {
         Cell* cells_ptr = &cells[0][0][0];
         for (int i = 0; i < 27; ++i) {
             (cells_ptr + i)->draw();
+        }
+    }
+    virt update(float delta) -> void {
+        GameObjectTemplate::update(delta);
+        Cell* cells_ptr = &cells[0][0][0];
+        for (int i = 0; i < 27; ++i) {
+            (cells_ptr + i)->update(delta);
         }
     }
 };

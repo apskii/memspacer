@@ -12,28 +12,27 @@
 #include "effects/blink.hpp"
 #include "effects/rotation.hpp"
 
-static void error_callback(int error, const char* description) {
+func error_callback(int error, const char* description) -> void {
     fputs(description, stderr);
 }
 
-static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+func key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) -> void {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GL_TRUE);
 }
 
-int main() {
-    auto e = WrapEffectTerm<Cell>{ new Blink(0.2, Vec4{ 0, 0, 0, 0 }) };
+func test_effect_algebra() -> void {
+    auto e = WrapEffectTerm<Cell>{ new Blink<Cell>(0.2, Vec4{ 0, 0, 0, 0 }) };
     Pool effect_pool(32);
     EffectAlgebra effect_algebra(effect_pool);
     auto term = (e || e) >> (e >> (e || e) >> e) >> e;
     std::cout << sizeof(decltype(term));
-    effect_algebra.eval( (e || e) >> (e >> (e || e) >> e) >> e );
+    effect_algebra.eval((e || e) >> (e >> (e || e) >> e) >> e);
     std::cin.get();
-    return 0;
-    // std::cout << sizeof(Cube);
-    // std::cin.get();
-    // return 0;
-    Rotation<Cell> xx(Quat{ 0, 0, 0, 0 });
+}
+
+func main() -> int {
+    // Rotation<Cell> xx(Quat{ 0, 0, 0, 0 });
     Cube c {
         Vec3 { 0.f, 0.f, 0.f },
         Quat { 0.f, 0.f, 0.f, 0.f }
@@ -73,7 +72,7 @@ int main() {
         curTime = newTime;
         // if (delta < 0.016) continue;
         // angle += std::min(delta, 0.016f) * 100;
-        angle += delta * 50;
+        angle += delta * 80;
         // angle += 0.016f * 100;
         // delta = 0;
         glClear(GL_COLOR_BUFFER_BIT);
@@ -85,13 +84,14 @@ int main() {
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         glColor3f(1, 0, 0);
         c.draw();
+        c.update(delta);
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
     glfwDestroyWindow(window);
     glfwTerminate();
-    std::cout << min_delta << std::endl << max_delta;
-    std::cin.get();
+    // std::cout << min_delta << std::endl << max_delta;
+    // std::cin.get();
     exit(EXIT_SUCCESS);
 }
 // Vec4 v = { 0.0, 0.0, 0.0, 0.0 };

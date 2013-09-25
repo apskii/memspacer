@@ -1,21 +1,26 @@
 #ifndef EFFECTS_ROTATION_HPP
 #define EFFECTS_ROTATION_HPP
 
+// #include <glm/gtx/quaternion.hpp>
+// #include <glm/gtc/quaternion.hpp>
 #include "../core/defs.hpp"
 #include "../core/effect.hpp"
 
-TPL(Rotatable) struct Rotation : public Effect<Rotatable> {
+TPL(Oriented) struct Rotation : public Effect<Oriented> {
+    float duration;
     Quat orientation;
-    Rotation(Quat orientation)
-        : orientation(orientation)
+    Rotation(float duration, Quat orientation)
+        : duration(duration)
+        , orientation(orientation)
     {}
     virt is_expired() const -> bool {
-        return true;
+        return duration <= 0;
     }
-    virt apply(Rotatable& obj) const -> void {
-
+    virt apply(Oriented& obj, float delta) const -> void {
+        obj.orientation = glm::mix(obj.orientation, orientation, delta / duration);
     }
-    virt update(float) -> void {
+    virt update(float delta) -> void {
+        duration -= delta;
     }
 };
 

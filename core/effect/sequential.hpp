@@ -16,11 +16,11 @@ public:
     virt is_expired() const -> bool {
         return second->is_expired();
     }
-    virt apply(T& target) const -> void {
+    virt apply(T& target, float delta) const -> void {
         if (first->is_expired())
-            second->apply(target);
+            second->apply(target, delta);
         else
-            first->apply(target);
+            first->apply(target, delta);
     }
     virt update(float delta) -> void {
         if (first->is_expired())

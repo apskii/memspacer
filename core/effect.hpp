@@ -10,9 +10,9 @@ TPL(T) struct Effect {
     static_assert(std::is_base_of<GameObject, T>::value,
         "T <: GameObject required in Effect<T>"
     );
-    virt is_expired() const -> bool = 0;
-    virt apply(T&)    const -> void = 0;
-    virt update(float)      -> void = 0;
+    virt is_expired()     const -> bool = 0;
+    virt apply(T&, float) const -> void = 0;
+    virt update(float)          -> void = 0;
 };
 
 TPL(E) class CheckEffect {
@@ -21,6 +21,6 @@ TPL(E) class CheckEffect {
     );
 };
 
-#define CHECK_EFFECT(TYPE) struct Check ## TYPE : public CheckEffect<TYPE> {}
+#define CHECK_EFFECT(NAME, TYPE) struct NAME ## Checker : public CheckEffect<TYPE> {}
 
 #endif CORE_EFFECT_HPP

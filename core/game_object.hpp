@@ -25,10 +25,10 @@ public:
         for (auto effect : effects) {
             effect->update(delta);
             if (!effect->is_expired())
-                effect->apply(*((Self*) this));
+                effect->apply(*((Self*) this), delta);
         }
     }
-    meth add_effect(Effect<Self> effect) -> void {
+    meth add_effect(Effect<Self>* effect) -> void {
         effects.push_back(effect);
     }
 private:

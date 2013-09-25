@@ -6,9 +6,10 @@
 
 struct Cell : public GameObjectTemplate<Cell> {
     static float edge_length;
-    Cell() : Cell(Vec3(), Quat()) {}
-    Cell(Vec3 position, Quat orientation)
+    Vec4 color;
+    Cell(Vec3 position = Vec3(), Quat orientation = Quat(), Vec4 color = Vec4(1., 1., 1., 1.))
         : GameObjectTemplate(position, orientation)
+        , color(color)
     {}
     virt draw() -> void {
         float r = edge_length / 2.f;
@@ -24,6 +25,7 @@ struct Cell : public GameObjectTemplate<Cell> {
             p + o * Vec3 { -r, +r, -r },
             p + o * Vec3 { +r, +r, -r }
         };
+        glColor3fv(&color[0]);
         glBegin(GL_TRIANGLE_STRIP);
         glVertex3fv(&vs[3][0]);
         glVertex3fv(&vs[1][0]);
