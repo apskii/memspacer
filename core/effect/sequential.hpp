@@ -12,7 +12,10 @@ public:
     Sequential(Effect<T>* first, Effect<T>* second)
         : first(first)
         , second(second)
-    {}
+    {
+        first->is_owned = true;
+        second->is_owned = true;
+    }
     virt is_expired() const -> bool {
         return second->is_expired();
     }

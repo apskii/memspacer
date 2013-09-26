@@ -2,9 +2,9 @@
 #define GAME_OBJECTS_CUBE_HPP
 
 #include "../core/game_object.hpp"
-#include "cell.hpp"
 #include "../effects/blink.hpp"
 #include "../effects/rotation.hpp"
+#include "cell.hpp"
 
 class Cube : public GameObjectTemplate<Cube> {
 private:
@@ -26,9 +26,8 @@ public:
                             position.z + z * dp
                         },
                         glm::angleAxis(0.f, 0.f, 0.f, 1.f)
-                        // Quat(Vec3(1.57f, 1.57f, 0.f))
                     );
-                    cells[x][y][z].add_effect(new Rotation<Cell>(4., glm::angleAxis(90.f, 0.f, 0.f, 1.f)));
+                    // cells[x][y][z].add_effect(effect);
                 }
     }
     virt draw() -> void {
@@ -37,12 +36,20 @@ public:
             (cells_ptr + i)->draw();
         }
     }
-    virt update(float delta) -> void {
-        GameObjectTemplate::update(delta);
+    virt update(float delta, Pool& pool) -> void {
+        GameObjectTemplate::update(delta, pool);
         Cell* cells_ptr = &cells[0][0][0];
         for (int i = 0; i < 27; ++i) {
-            (cells_ptr + i)->update(delta);
+            (cells_ptr + i)->update(delta, pool);
         }
+    }
+    meth update_orientation(Quat orientation) -> void {
+        Cell* cells_ptr = &cells[0][0][0];
+        for (int i = 0; i < 27; ++i) {
+            Cell& cell = *(cells_ptr + i);            
+            cell.update_position(orientation * glm::inverse(this->orientation) * cell.position);
+        }
+        this->orientation = orientation;
     }
 };
 

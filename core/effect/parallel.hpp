@@ -10,8 +10,12 @@ private:
     Effect<T>* second;
 public:
     Parallel(Effect<T>* first, Effect<T>* second)
-        : first(first), second(second)
-    {}
+        : first(first)
+        , second(second)
+    {
+        first->is_owned = true;
+        second->is_owned = true;
+    }
     virt is_expired() const -> bool {
         return first->is_expired()
             && second->is_expired();

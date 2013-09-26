@@ -43,6 +43,9 @@ struct Cell : public GameObjectTemplate<Cell> {
         glVertex3fv(&vs[1][0]);
         glEnd();
     }
+    meth update_color(Vec4 color) -> void {
+        this->color = color;
+    }
 };
 
 float Cell::edge_length = 0.3;

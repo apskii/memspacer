@@ -15,7 +15,7 @@ TPL(Oriented) struct Rotation : public Effect<Oriented> {
         return duration <= 0;
     }
     virt apply(Oriented& obj, float delta) const -> void {
-        obj.orientation = glm::mix(obj.orientation, orientation, delta / duration);
+        obj.update_orientation(glm::mix(obj.orientation, orientation, delta / duration));
     }
     virt update(float delta) -> void {
         duration -= delta;
