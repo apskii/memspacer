@@ -16,7 +16,7 @@ TPL(Colored) struct Blink : public Effect<Colored> {
         return duration <= 0;
     }
     virt apply(Colored& obj, float delta) const -> void {
-        obj.update_color((color - obj.color) * delta / duration);
+        obj.color = (color - obj.color) * delta / duration;
     }
     virt update(float delta) -> void {
         duration -= delta;
@@ -24,10 +24,11 @@ TPL(Colored) struct Blink : public Effect<Colored> {
 };
 
 #include "../game_objects/cell.hpp"
-CHECK_EFFECT(Blink, Blink<Cell>);
+#include "../game_objects/cube.hpp"
+CHECK_EFFECT(Blink, Blink<Cell<Cube>>);
 
-TPL(Colored) func blink(float duration, Vec4 color, Pool* pool = implicit_effect_pool) -> WrapEffectTerm<Colored> {
-    return WrapEffectTerm<Colored>(new (pool->malloc()) Blink<Colored>(duration, color));
+TPL(Colored) func blink(float duration, Vec4 color, Pool& pool) -> WrapEffectTerm<Colored> {
+    return WrapEffectTerm<Colored>(new (pool.malloc()) Blink<Colored>(duration, color));
 }
 
 #endif EFFECTS_BLINK_HPP

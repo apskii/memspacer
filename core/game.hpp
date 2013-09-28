@@ -3,7 +3,9 @@
 
 #include <GLFW/glfw3.h>
 #include "defs.hpp"
+#include "../core/effect/algebra.hpp"
 #include "../game_objects/cube.hpp"
+#include "../effects/rotation.hpp"
 
 struct Game {
     Cube cube;
@@ -21,7 +23,8 @@ struct Game {
         });
         if (!glfwInit())
             exit(EXIT_FAILURE);
-        window = glfwCreateWindow(1920, 1080, "memspacer", glfwGetPrimaryMonitor(), NULL);
+        // window = glfwCreateWindow(1920, 1080, "memspacer", glfwGetPrimaryMonitor(), NULL);
+        window = glfwCreateWindow(640, 480, "memspacer", NULL, NULL);
         if (!window) {
             glfwTerminate();
             exit(EXIT_FAILURE);
@@ -46,9 +49,11 @@ struct Game {
         glMatrixMode(GL_MODELVIEW);
     }
     meth loop() -> void {
-        implicit_effect_pool = &effect_pool;
-        auto effect = EffectAlgebra().eval(
-            rotation<Cube>(10, glm::angleAxis(90.f, 0.f, 0.f, 1.f))
+        auto& p = effect_pool;
+        auto* effect = EffectAlgebra(p).eval(
+            rotation<Cube>(3, glm::angleAxis(90.f, 1.f, 0.f, 0.f), p)
+            // rotation<Cube>(cube, 3, glm::angleAxis(180.f, 0.f, 0.f, 1.f), p)
+            
         );
         cube.add_effect(effect);
         float cur_time = glfwGetTime();

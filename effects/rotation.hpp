@@ -14,16 +14,19 @@ TPL(Oriented) struct Rotation : public Effect<Oriented> {
     virt is_expired() const -> bool {
         return duration <= 0;
     }
-    virt apply(Oriented& obj, float delta) const -> void {
-        obj.update_orientation(glm::mix(obj.orientation, orientation, delta / duration));
+    virt apply(Oriented& target, float delta) const -> void {
+        target.orientation = glm::mix(target.orientation, orientation, delta / duration);
     }
     virt update(float delta) -> void {
         duration -= delta;
     }
 };
 
-TPL(Oriented) func rotation(float duration, Quat orientation, Pool* pool = implicit_effect_pool) -> WrapEffectTerm<Oriented> {
-    return WrapEffectTerm<Oriented>(new (pool->malloc()) Rotation<Oriented>(duration, orientation));
+struct Cube;
+CHECK_EFFECT(Rotation, Rotation<Cube>);
+
+TPL(Oriented) func rotation(float duration, Quat orientation, Pool& pool) -> WrapEffectTerm<Oriented> {
+    return WrapEffectTerm<Oriented>(new (pool.malloc()) Rotation<Oriented>(duration, orientation));
 }
 
 #endif EFFECTS_ROTATION_HPP

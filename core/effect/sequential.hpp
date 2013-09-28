@@ -4,6 +4,8 @@
 #include "../defs.hpp"
 #include "../effect.hpp"
 
+#include <iostream>
+
 TPL(T) class Sequential : public Effect<T> {    
 private:
     Effect<T>* first;
@@ -12,11 +14,10 @@ public:
     Sequential(Effect<T>* first, Effect<T>* second)
         : first(first)
         , second(second)
-    {
-        first->is_owned = true;
-        second->is_owned = true;
-    }
+    {}
     virt is_expired() const -> bool {
+        if (second->is_expired())
+            std::cout << "expired!" << std::endl;
         return second->is_expired();
     }
     virt apply(T& target, float delta) const -> void {

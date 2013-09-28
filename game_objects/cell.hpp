@@ -4,17 +4,18 @@
 #include "../core/defs.hpp"
 #include "../core/game_object.hpp"
 
-struct Cell : public GameObjectTemplate<Cell> {
-    static float edge_length;
+TPL(Owner) struct Cell : public GameObjectTemplate<Cell<Owner>> {
+    Owner* parent;
     Vec4 color;
-    Cell(Vec3 position = Vec3(), Quat orientation = Quat(), Vec4 color = Vec4(1., 1., 1., 1.))
+    Cell(Owner* parent = nullptr, Vec3 position = Vec3(), Quat orientation = Quat(), Vec4 color = Vec4(1., 1., 1., 1.))
         : GameObjectTemplate(position, orientation)
+        , parent(parent)
         , color(color)
     {}
     virt draw() -> void {
-        float r = edge_length / 2.f;
-        auto& p = this->position;
-        auto& o = this->orientation;
+        float r = parent->cell_size / 2.f;
+        auto& p = parent->orientation * position;
+        auto& o = orientation * parent->orientation;
         Vec3 vs [] = {
             p + o * Vec3 { -r, -r, -r },
             p + o * Vec3 { -r, -r, +r },
@@ -43,11 +44,6 @@ struct Cell : public GameObjectTemplate<Cell> {
         glVertex3fv(&vs[1][0]);
         glEnd();
     }
-    meth update_color(Vec4 color) -> void {
-        this->color = color;
-    }
 };
-
-float Cell::edge_length = 0.3;
 
 #endif GAME_OBJECTS_CELL_HPP
