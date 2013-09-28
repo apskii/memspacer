@@ -10,17 +10,17 @@
 TPL_2(ET1, ET2) struct SeqEffectTerm;
 TPL_2(ET1, ET2) struct ParEffectTerm;
 
-TPL_2(Self, T) struct EffectTerm {    
+TPL_2(Self, T) struct EffectTerm {
     typedef T EffectTarget;
     TPL(ET) meth operator>>(ET other) -> inline SeqEffectTerm<Self, ET> {
         return SeqEffectTerm<Self, ET>(*((Self*) this), other);
-    }    
+    }
     TPL(ET) meth operator||(ET other) -> inline ParEffectTerm<Self, ET> {
         return ParEffectTerm<Self, ET>(*((Self*) this), other);
     }
 };
 
-TPL(T) struct WrapEffectTerm : public EffectTerm<WrapEffectTerm<T>, T> {    
+TPL(T) struct WrapEffectTerm : public EffectTerm<WrapEffectTerm<T>, T> {
     Effect<T>* effect;
     WrapEffectTerm(Effect<T>* effect)
         : effect(effect)
@@ -30,7 +30,7 @@ TPL(T) struct WrapEffectTerm : public EffectTerm<WrapEffectTerm<T>, T> {
     }
 };
 
-TPL_2(ET1, ET2) struct SeqEffectTerm 
+TPL_2(ET1, ET2) struct SeqEffectTerm
     : public EffectTerm<SeqEffectTerm<ET1, ET2>, typename ET1::EffectTarget>
     , public std::pair<ET1, ET2>
 {
@@ -38,11 +38,11 @@ TPL_2(ET1, ET2) struct SeqEffectTerm
         : std::pair<ET1, ET2>(first, second)
     {}
     meth eval(Pool& pool) -> inline Effect<EffectTarget>* {
-        return new (pool.malloc()) Sequential<EffectTarget>(first.eval(pool), second.eval(pool));
+        return new (pool.malloc()) Sequential<EffectTarget>(*first.eval(pool), *second.eval(pool));
     }
 };
 
-TPL_2(ET1, ET2) struct ParEffectTerm 
+TPL_2(ET1, ET2) struct ParEffectTerm
     : public EffectTerm<ParEffectTerm<ET1, ET2>, typename ET1::EffectTarget>
     , public std::pair<ET1, ET2>
 {
@@ -50,14 +50,14 @@ TPL_2(ET1, ET2) struct ParEffectTerm
         : std::pair<ET1, ET2>(first, second)
     {}
     meth eval(Pool& pool) -> inline Effect<EffectTarget>* {
-        return new (pool.malloc()) Parallel<EffectTarget>(first.eval(pool), second.eval(pool));
+        return new (pool.malloc()) Parallel<EffectTarget>(*first.eval(pool), *second.eval(pool));
     }
 };
 
 struct EffectAlgebra {
     Pool& effect_pool;
-    EffectAlgebra(Pool& effect_pool = *implicit_effect_pool)
-        : effect_pool(effect_pool)
+    EffectAlgebra(Pool& pool)
+        : effect_pool(pool)
     {}
     TPL(ET) meth eval(ET term) -> inline Effect<typename ET::EffectTarget>* {
         return term.eval(effect_pool);

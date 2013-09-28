@@ -13,12 +13,6 @@ struct GameObject {
     {}
     virt update(float, Pool&) -> void = 0;
     virt draw()               -> void = 0;
-    meth update_position(Vec3 position) -> void {
-        this->position = position;
-    }
-    meth update_orientation(Quat orientation) -> void {
-        this->orientation = orientation;
-    }
 };
 
 TPL(Self) class GameObjectTemplate : public GameObject {
@@ -32,17 +26,20 @@ public:
         auto end = std::end(effects);
         while (it != end) {
             auto effect = *it;
-            effect->update(delta);
+            effect->update(*((Self*) this), delta);
             if (!effect->is_expired()) {
                 effect->apply(*((Self*) this), delta);
                 ++it;
-            } else {
+            }
+            else {
                 it = effects.erase(it);
+                effect->free(pool);
                 pool.free(effect);
             }
         }
     }
-    meth add_effect(Effect<Self>* effect) -> void {
+    meth attach_effect(Effect<Self>* effect) -> void {
+        effect->init(*((Self*) this));
         effects.push_back(effect);
     }
 private:

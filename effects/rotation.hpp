@@ -11,14 +11,17 @@ TPL(Oriented) struct Rotation : public Effect<Oriented> {
         : duration(duration)
         , orientation(orientation)
     {}
+    virt init(const Oriented& target) -> void {
+        orientation = orientation * target.orientation;
+    }
+    virt update(const Oriented&, float delta) -> void {
+        duration -= delta;
+    }
     virt is_expired() const -> bool {
         return duration <= 0;
     }
     virt apply(Oriented& target, float delta) const -> void {
         target.orientation = glm::mix(target.orientation, orientation, delta / duration);
-    }
-    virt update(float delta) -> void {
-        duration -= delta;
     }
 };
 

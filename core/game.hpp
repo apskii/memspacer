@@ -50,12 +50,10 @@ struct Game {
     }
     meth loop() -> void {
         auto& p = effect_pool;
-        auto* effect = EffectAlgebra(p).eval(
-            rotation<Cube>(3, glm::angleAxis(90.f, 1.f, 0.f, 0.f), p)
-            // rotation<Cube>(cube, 3, glm::angleAxis(180.f, 0.f, 0.f, 1.f), p)
-            
-        );
-        cube.add_effect(effect);
+        auto* effect
+            = (rotation<Cube>(3, glm::angleAxis(90.f, 1.f, 0.f, 0.f), p)
+            >> rotation<Cube>(3, glm::angleAxis(90.f, 0.f, 0.f, 1.f), p)).eval(p);
+        cube.attach_effect(effect);
         float cur_time = glfwGetTime();
         for (;;) {
             float new_time = glfwGetTime();
