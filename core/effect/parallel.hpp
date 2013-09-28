@@ -21,7 +21,7 @@ public:
         pool.free(&first);
         pool.free(&second);
     }
-    virt update(T& target, float delta) -> void {
+    virt update(const T& target, float delta) -> void {
         first.update(target, delta);
         second.update(target, delta);
     }
