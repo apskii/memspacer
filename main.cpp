@@ -1,5 +1,5 @@
 #include "core/game.hpp"
 
-func main() -> int {
+func main() -> void {
     Game().loop();
 }

@@ -4,24 +4,28 @@
 #include "../core/defs.hpp"
 #include "../core/effect.hpp"
 
+#include <iostream>
+
 TPL(Oriented) struct Rotation : public Effect<Oriented> {
-    float duration;
+    const float duration;
+    float remaining;
+    float delta_sum;
     Quat orientation;
     Rotation(float duration, Quat orientation)
         : duration(duration)
+        , remaining(duration)
         , orientation(orientation)
+        , delta_sum(0.f)
     {}
-    virt init(const Oriented& target) -> void {
-        orientation = orientation * target.orientation;
-    }
-    virt update(const Oriented&, float delta) -> void {
-        duration -= delta;
-    }
-    virt is_expired() const -> bool {
-        return duration <= 0;
-    }
-    virt apply(Oriented& target, float delta) const -> void {
-        target.orientation = glm::mix(target.orientation, orientation, std::min(delta / duration, 1.f));
+    virt process(Oriented& target, float delta) -> bool {
+        static const auto unit = Quat();
+        auto delta_step = delta / duration;
+        delta_sum += delta_step;
+        if (delta_sum > 1.f)
+            delta_step = delta_step - delta_sum + 1.f;
+        auto delta_o = glm::mix(unit, orientation, delta_step);
+        target.orientation = delta_o * target.orientation;
+        return (remaining -= delta) <= 0;
     }
 };
 

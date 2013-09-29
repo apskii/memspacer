@@ -17,34 +17,18 @@ public:
         , second(second)
         , first_done(false)
     {}
-    virt init(const T& target) -> void {
-        first.init(target);
-    }
     virt free(Pool& pool) -> void {
         pool.free(&first);
         pool.free(&second);
     }
-    virt update(const T& target, float delta) -> void {
+    virt process(T& target, float delta) -> bool {
         if (!first_done) {
-            first.update(target, delta);
-            if (first.is_expired()) {
+            if (first.process(target, delta))
                 first_done = true;
-                second.init(target);
-            }
+            return false;
         }
         else {
-            second.update(target, delta);
-        }
-    }
-    virt is_expired() const -> bool {
-        return second.is_expired();
-    }
-    virt apply(T& target, float delta) const -> void {
-        if (first_done) {
-            second.apply(target, delta);
-        }
-        else {
-            first.apply(target, delta);
+            return second.process(target, delta);
         }
     }
 };

@@ -26,9 +26,7 @@ public:
         auto end = std::end(effects);
         while (it != end) {
             auto effect = *it;
-            effect->update(*((Self*) this), delta);
-            if (!effect->is_expired()) {
-                effect->apply(*((Self*) this), delta);
+            if (!effect->process(*((Self*) this), delta)) {
                 ++it;
             }
             else {
@@ -39,7 +37,6 @@ public:
         }
     }
     meth attach_effect(Effect<Self>* effect) -> void {
-        effect->init(*((Self*) this));
         effects.push_back(effect);
     }
 private:

@@ -8,32 +8,23 @@ TPL(T) class Parallel : public Effect<T> {
 private:
     Effect<T>& first;
     Effect<T>& second;
+    bool first_done;
 public:
     Parallel(Effect<T>& first, Effect<T>& second)
         : first(first)
         , second(second)
+        , first_done(false)
     {}
-    virt init(const T& target) -> void {
-        first.init(target);
-        second.init(target);
-    }
     virt free(Pool& pool) -> void {
         pool.free(&first);
         pool.free(&second);
     }
-    virt update(const T& target, float delta) -> void {
-        first.update(target, delta);
-        second.update(target, delta);
-    }
-    virt is_expired() const -> bool {
-        return first.is_expired()
-            && second.is_expired();
-    }
-    virt apply(T& target, float delta) const -> void {
-        if (!first.is_expired())
-            first.apply(target, delta);
-        if (!second.is_expired())
-            second.apply(target, delta);
+    virt process(T& target, float delta) -> bool {
+        if (!first_done) {
+            if (first.process(target, delta))
+                first_done = true;
+        }
+        return second.process(target, delta) && first_done;
     }
 };
 

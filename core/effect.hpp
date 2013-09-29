@@ -9,11 +9,8 @@ struct GameObject;
 TPL(T) struct Effect {
     static_assert(std::is_base_of<GameObject, T>::value,
         "T <: GameObject required in Effect<T>.");
-    virt init(const T&)          -> void  {};
-    virt free(Pool&)             -> void  {};
-    virt update(const T&, float) -> void = 0;
-    virt is_expired()     const  -> bool = 0;
-    virt apply(T&, float) const  -> void = 0;
+    virt free(Pool&)        -> void  {};
+    virt process(T&, float) -> bool = 0;
 };
 
 TPL(E) class CheckEffect {
