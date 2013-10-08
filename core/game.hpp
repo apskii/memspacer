@@ -34,9 +34,9 @@ struct RenderContext {
     }
 };
 
-struct GameContext {    
+struct GameContext {
     GLFWwindow* window;
-    Pool effect_pool;    
+    Pool effect_pool;
     RenderContext render_ctx;
     Cube<RenderContext> cube;
     GameContext(GLFWwindow* window, GLuint default_shader_program)
@@ -49,7 +49,7 @@ struct GameContext {
         )
     {}
     meth render() -> void {
-        glClear(GL_COLOR_BUFFER_BIT);      
+        glClear(GL_COLOR_BUFFER_BIT);
         cube.render(render_ctx);
         glfwSwapBuffers(window);
     }

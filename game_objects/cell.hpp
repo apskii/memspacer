@@ -33,17 +33,16 @@ struct CellVertices {
 TPL_2(Owner, RenderContext) class Cell : public GameObjectTemplate<Cell<Owner, RenderContext>, RenderContext> {
 private:
     Owner* parent;
-    GLuint vbo;    
-public:         
+public:
     Vec4 color;
     Cell() {}
     Cell(Owner* parent, Vec3 position, Quat orientation, Vec4 color = Vec4(1.f, 0.f, 0.f, 1.f))
         : GameObjectTemplate(position, orientation)
         , parent(parent)
         , color(color)
-    {}    
+    {}
     virt render(const RenderContext& ctx) -> void {
-        static CellVertices cell_vertices;        
+        static CellVertices cell_vertices;
         Mat4 mvp = ctx.view_proj * glm::toMat4(orientation * parent->orientation) * glm::translate(parent->orientation * position);
         glUniformMatrix4fv(ctx.mvp_var, 1, false, &mvp[0][0]);
         glUniform1f(ctx.scale_var, parent->cell_size);
