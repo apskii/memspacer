@@ -23,9 +23,10 @@ TPL(Colored) struct Blink : public Effect<Colored> {
     }
 };
 
-#include "../game_objects/cell.hpp"
-#include "../game_objects/cube.hpp"
-CHECK_EFFECT(Blink, Blink < Cell < Cube >> );
+namespace {
+    struct DummyColored { Vec4 color; };
+    CHECK_EFFECT(Blink, Blink<DummyColored>);
+}
 
 TPL(Colored) func blink(float duration, Vec4 color, Pool& pool) -> WrapEffectTerm<Colored> {
     return WrapEffectTerm<Colored>(new (pool.malloc()) Blink<Colored>(duration, color));

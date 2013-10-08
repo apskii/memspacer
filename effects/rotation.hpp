@@ -3,8 +3,7 @@
 
 #include "../core/defs.hpp"
 #include "../core/effect.hpp"
-
-#include <iostream>
+#include "../core/effect/algebra.hpp"
 
 TPL(Oriented) struct Rotation : public Effect<Oriented> {
     const float duration;
@@ -29,8 +28,10 @@ TPL(Oriented) struct Rotation : public Effect<Oriented> {
     }
 };
 
-struct Cube;
-CHECK_EFFECT(Rotation, Rotation<Cube>);
+namespace {
+    struct DummyOriented { Quat orientation; };
+    CHECK_EFFECT(Rotation, Rotation<DummyOriented>);
+}
 
 TPL(Oriented) func rotation(float duration, Quat orientation, Pool& pool) -> WrapEffectTerm<Oriented> {
     return WrapEffectTerm<Oriented>(new (pool.malloc()) Rotation<Oriented>(duration, orientation));

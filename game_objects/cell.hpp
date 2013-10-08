@@ -4,45 +4,56 @@
 #include "../core/defs.hpp"
 #include "../core/game_object.hpp"
 
-TPL(Owner) struct Cell : public GameObjectTemplate<Cell<Owner>> {
+struct CellVertices {
+    GLuint ibo;
+    GLuint vbo;
+    CellVertices() {
+        static const GLfloat vertices[24] = {
+            -1, -1, -1,
+            -1, -1, +1,
+            +1, -1, +1,
+            +1, -1, -1,
+            -1, +1, +1,
+            +1, +1, +1,
+            -1, +1, -1,
+            +1, +1, -1
+        };
+        glGenBuffers(1, &vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+        static const GLubyte indices [] = {
+            3, 1, 2, 5, 3, 7, 6, 5, 4, 1, 6, 0, 3, 1
+        };
+        glGenBuffers(1, &ibo);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    }
+};
+
+TPL_2(Owner, RenderContext) class Cell : public GameObjectTemplate<Cell<Owner, RenderContext>, RenderContext> {
+private:
     Owner* parent;
+    GLuint vbo;    
+public:         
     Vec4 color;
-    Cell(Owner* parent = nullptr, Vec3 position = Vec3(), Quat orientation = Quat(), Vec4 color = Vec4(1., 1., 1., 1.))
+    Cell() {}
+    Cell(Owner* parent, Vec3 position, Quat orientation, Vec4 color = Vec4(1.f, 0.f, 0.f, 1.f))
         : GameObjectTemplate(position, orientation)
         , parent(parent)
         , color(color)
-    {}
-    virt draw() -> void {
-        float r = parent->cell_size / 2.f;
-        auto& p = parent->orientation * position;
-        auto& o = orientation * parent->orientation;
-        Vec3 vs [] = {
-            p + o * Vec3 { -r, -r, -r },
-            p + o * Vec3 { -r, -r, +r },
-            p + o * Vec3 { +r, -r, +r },
-            p + o * Vec3 { +r, -r, -r },
-            p + o * Vec3 { -r, +r, +r },
-            p + o * Vec3 { +r, +r, +r },
-            p + o * Vec3 { -r, +r, -r },
-            p + o * Vec3 { +r, +r, -r }
-        };
-        glColor3fv(&color[0]);
-        glBegin(GL_TRIANGLE_STRIP);
-        glVertex3fv(&vs[3][0]);
-        glVertex3fv(&vs[1][0]);
-        glVertex3fv(&vs[2][0]);
-        glVertex3fv(&vs[5][0]);
-        glVertex3fv(&vs[3][0]);
-        glVertex3fv(&vs[7][0]);
-        glVertex3fv(&vs[6][0]);
-        glVertex3fv(&vs[5][0]);
-        glVertex3fv(&vs[4][0]);
-        glVertex3fv(&vs[1][0]);
-        glVertex3fv(&vs[6][0]);
-        glVertex3fv(&vs[0][0]);
-        glVertex3fv(&vs[3][0]);
-        glVertex3fv(&vs[1][0]);
-        glEnd();
+    {}    
+    virt render(const RenderContext& ctx) -> void {
+        static CellVertices cell_vertices;        
+        Mat4 mvp = ctx.view_proj * glm::toMat4(orientation * parent->orientation) * glm::translate(parent->orientation * position);
+        glUniformMatrix4fv(ctx.mvp_var, 1, false, &mvp[0][0]);
+        glUniform1f(ctx.scale_var, parent->cell_size);
+        glUniform4fv(ctx.color_var, 1, &color[0]);
+        glEnableVertexAttribArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, cell_vertices.vbo);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cell_vertices.ibo);
+        glDrawElements(GL_TRIANGLE_STRIP, 14, GL_UNSIGNED_BYTE, 0);
+        glDisableVertexAttribArray(0);
     }
 };
 

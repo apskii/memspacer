@@ -5,22 +5,24 @@
 #include "defs.hpp"
 #include "effect.hpp"
 
-struct GameObject {
+TPL(RenderContext) struct GameObject {
     Vec3 position;
     Quat orientation;
+    GameObject() {}
     GameObject(Vec3 position, Quat orientation)
         : position(position), orientation(orientation)
     {}
-    virt update(float, Pool&) -> void = 0;
-    virt draw()               -> void = 0;
+    virt update(float, Pool&)         -> void = 0;
+    virt render(const RenderContext&) -> void = 0;
 };
 
-TPL(Self) class GameObjectTemplate : public GameObject {
+TPL_2(Self, RenderContext) class GameObjectTemplate : public GameObject<RenderContext> {
 public:
+    GameObjectTemplate() {}
     GameObjectTemplate(Vec3 position, Quat orientation)
         : GameObject(position, orientation)
     {}
-    virt draw() -> void = 0;
+    virt render(const RenderContext&) -> void = 0;
     virt update(float delta, Pool& pool) -> void {
         auto it = std::begin(effects);
         auto end = std::end(effects);

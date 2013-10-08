@@ -54,14 +54,4 @@ TPL_2(ET1, ET2) struct ParEffectTerm
     }
 };
 
-struct EffectAlgebra {
-    Pool& effect_pool;
-    EffectAlgebra(Pool& pool)
-        : effect_pool(pool)
-    {}
-    TPL(ET) meth eval(ET term) -> inline Effect<typename ET::EffectTarget>* {
-        return term.eval(effect_pool);
-    }
-};
-
 #endif CORE_EFFECT_ALGEBRA_HPP
