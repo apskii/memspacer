@@ -11,7 +11,7 @@ TPL(T) struct Effect {
 
 TPL(E) class CheckEffect {
     static_assert(sizeof(E) <= 32,
-        "Effect subclasses should have sizeof <= 32 to fit into object pulls."
+        "Effect subclasses should have sizeof <= 32 to fit into object pools."
     );
 };
 
