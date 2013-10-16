@@ -43,7 +43,11 @@ public:
     {}
     virt render(const RenderContext& ctx) -> void {
         static CellVertices cell_vertices;
-        Mat4 mvp = ctx.view_proj * glm::toMat4(orientation * parent->orientation) * glm::translate(parent->orientation * position);
+        const Mat4 mv = ctx.view *
+            glm::translate(parent->orientation * position) *
+            glm::toMat4(orientation * parent->orientation);
+        const Mat4 mvp = ctx.proj * mv;
+        glUniformMatrix4fv(ctx.mv_var, 1, false, &mv[0][0]);
         glUniformMatrix4fv(ctx.mvp_var, 1, false, &mvp[0][0]);
         glUniform1f(ctx.scale_var, parent->cell_size);
         glUniform4fv(ctx.color_var, 1, &color[0]);
