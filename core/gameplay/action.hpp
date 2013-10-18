@@ -5,9 +5,9 @@
 #include "../generic/behaviour.hpp"
 #include "../generic/pooled.hpp"
 
-struct GameState;
+struct Session;
 
-struct Action : Pooled, Behaviour<GameState> {};
+struct Action : Pooled, Behaviour<Session> {};
 
 TPL(Action) struct CheckAction {
     static_assert(sizeof(Action) <= 32,
