@@ -1,12 +1,12 @@
 #version 400 core
 
-layout(location = 0) in vec3 vertex_position;
+layout (location = 0) in vec3 vertex_position;
 
 out vec3 position;
 out vec3 normal;
 
-uniform mat4  mv;
-uniform mat4  mvp;
+uniform mat4 mv;
+uniform mat4 mvp;
 uniform float scale;
 
 void main() {

@@ -1,5 +1,5 @@
-#include "core/game.hpp"
+#include "game.hpp"
 
 func main() -> void {
-    memspacer::game::run();
+    game::run();
 }

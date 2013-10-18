@@ -2,10 +2,12 @@
 #define ACTIONS_DANCE
 
 #include "../core/defs.hpp"
-#include "../core/gameplay/action.hpp"
+#include "../gameplay/action.hpp"
 
-struct Dance : Action {
-    Dance(int);
-};
+namespace actions {
+    struct Dance : gameplay::Action {
+        Dance(int);
+    };
+}
 
 #endif ACTIONS_DANCE

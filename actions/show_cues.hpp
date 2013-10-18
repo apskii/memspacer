@@ -2,8 +2,10 @@
 #define ACTIONS_SHOW_CUES
 
 #include "../core/defs.hpp"
-#include "../core/gameplay/action.hpp"
+#include "../gameplay/action.hpp"
 
-struct ShowCues : Action {};
+namespace actions {
+    struct ShowCues : gameplay::Action {};
+}
 
 #endif ACTIONS_SHOW_CUES

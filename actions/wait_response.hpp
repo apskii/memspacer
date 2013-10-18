@@ -2,8 +2,10 @@
 #define ACTIONS_WAIT_RESPONSE
 
 #include "../core/defs.hpp"
-#include "../core/gameplay/action.hpp"
+#include "../gameplay/action.hpp"
 
-struct WaitResponse : Action {};
+namespace actions {
+    struct WaitResponse : gameplay::Action {};
+}
 
 #endif ACTIONS_WAIT_RESPONSE

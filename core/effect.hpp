@@ -3,17 +3,20 @@
 
 #include <type_traits>
 #include "defs.hpp"
-#include "generic/behaviour.hpp"
-#include "generic/pooled.hpp"
 
-TPL(T) struct Effect : Pooled, Behaviour<T> {};
+namespace core {
+    TPL(T) struct Effect {
+        virt free(Pool&) -> void;
+        virt process(T&, float) -> bool;
+    };
 
-TPL(E) struct CheckEffect {
-    static_assert(sizeof(E) <= 32,
-        "Effect subclasses should have sizeof <= 32 to fit into object pools."
-    );
-};
+    TPL(E) struct CheckEffect {
+        static_assert(sizeof(E) <= 32,
+            "Effect subclasses should have sizeof <= 32 to fit into object pools."
+        );
+    };
+}
 
-#define CHECK_EFFECT(NAME, TYPE) struct NAME ## Checker : public CheckEffect<TYPE> {}
+#define CHECK_EFFECT(NAME, TYPE) struct NAME ## Checker : public core::CheckEffect<TYPE> {}
 
 #endif CORE_EFFECT_HPP
