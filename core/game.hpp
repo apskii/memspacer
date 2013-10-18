@@ -108,8 +108,8 @@ func init_ogl() -> tuple<GLFWwindow*, GLuint> {
         fputs(description, stderr);
     });
     if (!glfwInit()) exit(EXIT_FAILURE);
-    // window = glfwCreateWindow(1920, 1080, "memspacer", glfwGetPrimaryMonitor(), NULL);
-    val window = glfwCreateWindow(640, 480, "memspacer", NULL, NULL);
+    val window = glfwCreateWindow(1920, 1080, "memspacer", glfwGetPrimaryMonitor(), NULL);
+    // val window = glfwCreateWindow(640, 480, "memspacer", NULL, NULL);
     if (!window) die();
     glfwMakeContextCurrent(window);
     glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int, int action, int) -> void {
@@ -138,8 +138,9 @@ func run() -> void {
     var& p = game_ctx.effect_pool;
     typedef Cube<RenderContext> C;
     var* effect
-        = (rotation<C>(2, glm::angleAxis(90.f, 0.f, 1.f, 0.f), p)
-        // >> rotation<C>(2, glm::angleAxis(90.f, 0.f, 1.f, 0.f), p)
+        = (rotation<C>(2, glm::angleAxis(+90.f, 0.f, 1.f, 0.f), p)
+        >> rotation<C>(2, glm::angleAxis(+90.f, 0.f, 0.f, 1.f), p)
+        >> rotation<C>(2, glm::angleAxis(-90.f, 0.f, 1.f, 0.f), p)
         // || rotation<C>(2, glm::angleAxis(270.f, 1.f, 0.f, 0.f), p)
         ).eval(p);
     game_ctx.cube.attach_effect(effect);

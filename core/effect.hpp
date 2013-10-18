@@ -3,13 +3,12 @@
 
 #include <type_traits>
 #include "defs.hpp"
+#include "generic/behaviour.hpp"
+#include "generic/pooled.hpp"
 
-TPL(T) struct Effect {
-    virt free(Pool&)        -> void  {};
-    virt process(T&, float) -> bool = 0;
-};
+TPL(T) struct Effect : Pooled, Behaviour<T> {};
 
-TPL(E) class CheckEffect {
+TPL(E) struct CheckEffect {
     static_assert(sizeof(E) <= 32,
         "Effect subclasses should have sizeof <= 32 to fit into object pools."
     );
