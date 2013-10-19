@@ -44,14 +44,15 @@ namespace game_objects {
         {}
         virt render(const RenderContext& ctx) -> void {
             static CellVertices cell_vertices;
-            const Mat4 mv = ctx.view *
+            val mv = ctx.view *
                 glm::translate(parent->orientation * position) *
                 glm::toMat4(orientation * parent->orientation);
-            const Mat4 mvp = ctx.proj * mv;
-            glUniformMatrix4fv(ctx.mv_var, 1, false, &mv[0][0]);
-            glUniformMatrix4fv(ctx.mvp_var, 1, false, &mvp[0][0]);
-            glUniform1f(ctx.scale_var, parent->cell_size);
-            glUniform4fv(ctx.color_var, 1, &color[0]);
+            val mvp = ctx.proj * mv;
+            val& shader = ctx.default_shader;
+            glUniformMatrix4fv(shader.mv, 1, false, &mv[0][0]);
+            glUniformMatrix4fv(shader.mvp, 1, false, &mvp[0][0]);
+            glUniform1f(shader.scale, parent->cell_size);
+            glUniform4fv(shader.color, 1, &color[0]);
             glEnableVertexAttribArray(0);
             glBindBuffer(GL_ARRAY_BUFFER, cell_vertices.vbo);
             glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0);

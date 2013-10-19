@@ -35,6 +35,7 @@ namespace game_objects {
         }
         virt render(const RenderContext& ctx) -> void {
             Cell* cells_ptr = &cells[0][0][0];
+            ctx.default_shader.use();
             for (int i = 0; i < 27; ++i) {
                 (cells_ptr + i)->render(ctx);
             }

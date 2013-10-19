@@ -8,101 +8,78 @@
 #include "core/defs.hpp"
 #include "effect/algebra.hpp"
 #include "game_objects/cube.hpp"
-#include "effects/rotation.hpp"
+#include "game_objects/star_nest.hpp"
+#include "shaders/default.hpp"
+#include "shaders/star_nest.hpp"
 
 namespace game {
     using namespace std;
-    using game_objects::Cube;
 
     func run() -> void;
     func die() -> void;
 
     struct RenderContext {
-        GLuint
-            shader_program,
-            mv_var,
-            mvp_var,
-            scale_var,
-            color_var,
-            light_position_var,
-            light_intensity_var,
-            k_diffuse_var,
-            k_ambient_var,
-            k_specular_var,
-            shininess_var;
-        Mat4 view;
-        Mat4 proj;
-        RenderContext(GLuint shader_program, const Mat4& view, const Mat4& proj)
-            : shader_program(shader_program)
+        shaders::Default default_shader;
+        shaders::StarNest star_nest_shader;
+        Mat4 view, proj;
+        float global_time;
+        RenderContext(const Mat4& view, const Mat4& proj)
+            : default_shader({
+                { GL_VERTEX_SHADER, "shaders/glsl/default.v.glsl" },
+                { GL_FRAGMENT_SHADER, "shaders/glsl/default.f.glsl" }
+            })
+            , star_nest_shader({
+                { GL_VERTEX_SHADER, "shaders/glsl/star_nest.v.glsl" },
+                { GL_FRAGMENT_SHADER, "shaders/glsl/star_nest.f.glsl" }
+            })
             , view(view)
             , proj(proj)
-        {
-            mv_var = glGetUniformLocation(shader_program, "mv");
-            mvp_var = glGetUniformLocation(shader_program, "mvp");
-            scale_var = glGetUniformLocation(shader_program, "scale");
-            color_var = glGetUniformLocation(shader_program, "color");
-            light_position_var = glGetUniformLocation(shader_program, "light_position");
-            light_intensity_var = glGetUniformLocation(shader_program, "light_intensity");
-            k_diffuse_var = glGetUniformLocation(shader_program, "k_diffuse");
-            k_ambient_var = glGetUniformLocation(shader_program, "k_ambient");
-            k_specular_var = glGetUniformLocation(shader_program, "k_specular");
-            shininess_var = glGetUniformLocation(shader_program, "shininess");
-        }
+            , global_time(0.f)
+        {}
     };
 
     struct GameContext {
         GLFWwindow* window;
         Pool effect_pool;
         RenderContext render_ctx;
-        Cube<RenderContext> cube;
-        GameContext(GLFWwindow* window, GLuint default_shader_program)
+        game_objects::Cube<RenderContext> cube;
+        game_objects::StarNest<RenderContext> star_nest;
+        GameContext(GLFWwindow* window)
             : window(window)
             , cube(Vec3(0.f, 0.f, 0.f), glm::angleAxis(0.f, 0.f, 0.f, 1.f))
             , effect_pool(32)
-            , render_ctx(default_shader_program,
-            glm::lookAt(Vec3(0.f, 0.f, -3.f), Vec3(0.f, 0.f, 0.f), Vec3(0.f, 1.f, 0.f)),
-            glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 10.0f)
+            , render_ctx(
+                glm::lookAt(Vec3(0.f, 0.f, -3.f), Vec3(0.f, 0.f, 0.f), Vec3(0.f, 1.f, 0.f)),
+                glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 10.0f)
             )
-        {}
-        meth activate() -> void {
-            glUniform3f(render_ctx.light_position_var, 0, 2, -20);
-            glUniform3f(render_ctx.light_intensity_var, 0.3, 0, 1.0);
-            glUniform3f(render_ctx.k_diffuse_var, 1, 1, 1);
-            glUniform3f(render_ctx.k_ambient_var, 0.8, 0.8, 0.8);
-            glUniform3f(render_ctx.k_specular_var, 1, 1, 0);
-            glUniform1f(render_ctx.shininess_var, 1);
+        {
+            val& def_s = render_ctx.default_shader;
+            def_s.use();
+            glUniform3f(def_s.light_position, 0, 2, -20);
+            glUniform3f(def_s.light_intensity, 0.3, 0, 1.0);
+            glUniform3f(def_s.k_diffuse, 1, 1, 1);
+            glUniform3f(def_s.k_ambient, 0.8, 0.8, 0.8);
+            glUniform3f(def_s.k_specular, 1, 1, 0);
+            glUniform1f(def_s.shininess, 1);
+            val& star_s = render_ctx.star_nest_shader;
+            star_s.use();
+            glUniform2f(star_s.resolution, 640, 480);
+            val view_proj = render_ctx.proj * render_ctx.view;
+            glUniformMatrix4fv(star_s.view_proj, 1, GL_FALSE, &view_proj[0][0]);
         }
         meth render() -> void {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             cube.render(render_ctx);
+            star_nest.render(render_ctx);
             glfwSwapBuffers(window);
         }
         meth update(float delta) -> void {
+            render_ctx.global_time += delta;
             cube.update(delta, effect_pool);
         }
     };
 
-    func load_shader(GLenum shader_type, string file_path) -> GLuint {
-        ifstream ifs(file_path);
-        stringstream buffer;
-        buffer << ifs.rdbuf();
-        val  string = buffer.str();
-        val* source = string.c_str();
-        val  shader = glCreateShader(shader_type);
-        glShaderSource(shader, 1, &source, nullptr);
-        glCompileShader(shader);
-        return shader;
-    }
-
-    func load_shaders() -> GLuint {
-        val program = glCreateProgram();
-        glAttachShader(program, load_shader(GL_VERTEX_SHADER, "shaders/default.v.glsl"));
-        glAttachShader(program, load_shader(GL_FRAGMENT_SHADER, "shaders/default.f.glsl"));
-        glLinkProgram(program);
-        return program;
-    }
-
-    func init_ogl() -> tuple<GLFWwindow*, GLuint> {
+    func init_ogl() -> GLFWwindow* {
         glfwSetErrorCallback([](int error, const char* description) -> void {
             fputs(description, stderr);
         });
@@ -125,15 +102,11 @@ namespace game {
         GLuint vao;
         glGenVertexArrays(1, &vao);
         glBindVertexArray(vao);
-        val shader_program = load_shaders();
-        glUseProgram(shader_program);
-        return make_tuple(window, shader_program);
+        return window;
     }
 
     func run() -> void {
-        val ogl_info = init_ogl();
-        var game_ctx = GameContext(get<0>(ogl_info), get<1>(ogl_info));
-        game_ctx.activate();
+        var game_ctx = GameContext(init_ogl());
         float cur_time = glfwGetTime();
         for (;;) {
             float new_time = glfwGetTime();
