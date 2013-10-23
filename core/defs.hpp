@@ -29,7 +29,7 @@ typedef boost::pool<> Pool;
 
 #define HKT(TY_CON) template <template <typename> class TY_CON>
 
-#define func auto
+#define func static auto
 #define meth auto
 #define virt virtual auto
 

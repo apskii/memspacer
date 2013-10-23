@@ -1,5 +1,5 @@
-#include "game.hpp"
+#include "core/game.hpp"
 
-func main() -> void {
-    game::run();
+int main() {
+    return core::Game::run();
 }
