@@ -1,0 +1,4 @@
+[Project]
+Name=memspacer
+Manager=KDevCMakeManager
+VersionControl=kdevgit

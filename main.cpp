@@ -1,5 +1,6 @@
-#include "core/game.hpp"
+#include <iostream>
 
-int main() {
-    return core::Game::run();
+int main(int argc, char **argv) {
+    std::cout << "Hello, world!" << std::endl;
+    return 0;
 }
