@@ -1,6 +1,6 @@
-#version 400 core
+#version 130
 
-layout (location = 0) in vec3 vertex_position;
+in vec3 vertex_position;
 
 uniform mat4 view_proj;
 

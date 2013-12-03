@@ -1,8 +1,8 @@
-#ifndef GAME_OBJECTS_STAR_NEST
-#define GAME_OBJECTS_STAR_NEST
+#pragma once
 
 #include "../core/defs.hpp"
 #include "../core/game_object.hpp"
+#include "../core/render_context.hpp"
 
 namespace game_objects {
     struct StarNestVertices {
@@ -22,9 +22,9 @@ namespace game_objects {
         }
     };
 
-    TPL(RenderContext) struct StarNest : core::GameObjectTemplate<StarNest<RenderContext>, RenderContext> {
+    struct StarNest : core::GameObjectTemplate<StarNest> {
         StarNest() : GameObjectTemplate() {}
-        virt render(const RenderContext& ctx) -> void {
+        virtual void render(const core::RenderContext& ctx) {
             static StarNestVertices star_nest_vertices;
             ctx.star_nest_shader.use();
             glUniform1f(ctx.star_nest_shader.global_time, ctx.global_time);
@@ -36,5 +36,3 @@ namespace game_objects {
         }
     };
 }
-
-#endif GAME_OBJECTS_STAR_NEST

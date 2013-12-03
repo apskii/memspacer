@@ -1,13 +1,12 @@
-#ifndef CORE_EFFECT_HPP
-#define CORE_EFFECT_HPP
+#pragma once
 
 #include <type_traits>
 #include "defs.hpp"
 
 namespace core {
     TPL(T) struct Effect {
-        virt free(Pool&) -> void;
-        virt process(T&, float) -> bool;
+        virtual void free(Pool&);
+        virtual bool process(T&, float);
     };
 
     TPL(E) struct CheckEffect {
@@ -18,5 +17,3 @@ namespace core {
 }
 
 #define CHECK_EFFECT(NAME, TYPE) struct NAME ## Checker : public core::CheckEffect<TYPE> {}
-
-#endif CORE_EFFECT_HPP

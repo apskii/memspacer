@@ -1,30 +1,29 @@
-#ifndef CORE_GAME_OBJECT_HPP
-#define CORE_GAME_OBJECT_HPP
+#pragma once
 
 #include <list>
 #include "defs.hpp"
 #include "effect.hpp"
 
 namespace core {
-    TPL(RenderContext) struct GameObject {
+    struct GameObject {
         Vec3 position;
         Quat orientation;
         GameObject() {}
         GameObject(Vec3 position, Quat orientation)
             : position(position), orientation(orientation)
         {}
-        virt update(float, Pool&)         -> void = 0;
-        virt render(const RenderContext&) -> void = 0;
+        virtual void update(float, Pool&)         = 0;
+        virtual void render(const RenderContext&) = 0;
     };
 
-    TPL_2(Self, RenderContext) class GameObjectTemplate : public GameObject<RenderContext> {
+    TPL(Self) class GameObjectTemplate : public GameObject {
     public:
         GameObjectTemplate() {}
         GameObjectTemplate(Vec3 position, Quat orientation)
             : GameObject(position, orientation)
         {}
-        virt render(const RenderContext&) -> void = 0;
-        virt update(float delta, Pool& pool) -> void {
+        virtual void render(const RenderContext&) = 0;
+        virtual void update(float delta, Pool& pool) {
             auto it = std::begin(effects);
             auto end = std::end(effects);
             while (it != end) {
@@ -39,12 +38,10 @@ namespace core {
                 }
             }
         }
-        meth attach_effect(Effect<Self>* effect) -> void {
+        void attach_effect(Effect<Self>* effect) {
             effects.push_back(effect);
         }
     private:
         std::list<Effect<Self>*> effects;
     };
 }
-
-#endif CORE_GAME_OBJECT_HPP

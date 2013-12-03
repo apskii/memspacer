@@ -1,5 +1,4 @@
-#ifndef GAMEPLAY_ACTION
-#define GAMEPLAY_ACTION
+#pragma once
 
 #include "../core/defs.hpp"
 
@@ -19,5 +18,3 @@ namespace gameplay {
 }
 
 #define CHECK_ACTION(NAME, TYPE) struct NAME ## Checker : public gameplay::CheckAction<TYPE> {}
-
-#endif GAMEPLAY_ACTION

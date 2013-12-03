@@ -1,9 +1,9 @@
-#version 400 core
+#version 130
 
 in vec3 position;
 in vec3 normal;
 
-layout (location = 0) out vec4 frag_color;
+out vec4 frag_color;
 
 uniform vec3 light_position;
 uniform vec3 light_intensity;

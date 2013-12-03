@@ -1,5 +1,4 @@
-#ifndef ACTIONS_DANCE
-#define ACTIONS_DANCE
+#pragma once
 
 #include "../core/defs.hpp"
 #include "../gameplay/action.hpp"
@@ -9,5 +8,3 @@ namespace actions {
         Dance(int);
     };
 }
-
-#endif ACTIONS_DANCE

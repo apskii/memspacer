@@ -1,8 +1,8 @@
-#ifndef GAME_OBJECTS_CELL_HPP
-#define GAME_OBJECTS_CELL_HPP
+#pragma once
 
 #include "../core/defs.hpp"
 #include "../core/game_object.hpp"
+#include "../core/render_context.hpp"
 
 namespace game_objects {
     struct CellVertices {
@@ -31,24 +31,24 @@ namespace game_objects {
         }
     };
 
-    TPL_2(Owner, RenderContext) class Cell : public core::GameObjectTemplate<Cell<Owner, RenderContext>, RenderContext> {
+    TPL(Owner) class Cell : public core::GameObjectTemplate<Cell<Owner>> {
     private:
         Owner* parent;
     public:
         Vec4 color;
         Cell() {}
         Cell(Owner* parent, Vec3 position, Quat orientation, Vec4 color = Vec4(1.f, 0.f, 0.f, 1.f))
-            : GameObjectTemplate(position, orientation)
+            : core::GameObjectTemplate<Cell<Owner>>(position, orientation)
             , parent(parent)
             , color(color)
         {}
-        virt render(const RenderContext& ctx) -> void {
+        virtual void render(const core::RenderContext& ctx) {
             static CellVertices cell_vertices;
-            val mv = ctx.view *
-                glm::translate(parent->orientation * position) *
-                glm::toMat4(orientation * parent->orientation);
-            val mvp = ctx.proj * mv;
-            val& shader = ctx.default_shader;
+            auto mv = ctx.view *
+	      glm::translate(parent->orientation * this->position) *
+	      glm::toMat4(this->orientation * parent->orientation);
+            auto mvp = ctx.proj * mv;
+            auto& shader = ctx.default_shader;
             glUniformMatrix4fv(shader.mv, 1, false, &mv[0][0]);
             glUniformMatrix4fv(shader.mvp, 1, false, &mvp[0][0]);
             glUniform1f(shader.scale, parent->cell_size);
@@ -62,5 +62,3 @@ namespace game_objects {
         }
     };
 }
-
-#endif GAME_OBJECTS_CELL_HPP

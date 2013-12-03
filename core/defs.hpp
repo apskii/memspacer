@@ -1,7 +1,8 @@
-#ifndef CORE_DEFS_HPP
-#define CORE_DEFS_HPP
+#pragma once
 
 #include <GL/glew.h>
+// #include <GL/gl.h>
+// #include <GL/glu.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 // #include <glm/gtc/matrix_transform.hpp>
@@ -20,20 +21,5 @@ typedef glm::mat4 Mat4;
 
 typedef boost::pool<> Pool;
 
-#define TSPEC template<>
-
-#define TPL(A)         template<typename A>
-#define TPL_2(A,B)     template<typename A, typename B>
-#define TPL_3(A,B,C)   template<typename A, typename B, typename C>
-#define TPL_4(A,B,C,D) template<typename A, typename B, typename C, typename D>
-
-#define HKT(TY_CON) template <template <typename> class TY_CON>
-
-#define func static auto
-#define meth auto
-#define virt virtual auto
-
-#define val const auto
-#define var auto
-
-#endif CORE_DEFS_HPP
+#define TPL(A)     template<typename A>
+#define TPL_2(A,B) template<typename A, typename B>

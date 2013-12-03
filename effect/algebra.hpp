@@ -1,5 +1,4 @@
-#ifndef EFFECT_ALGEBRA
-#define EFFECT_ALGEBRA
+#pragma once
 
 #include <utility>
 #include "../core/defs.hpp"
@@ -14,48 +13,52 @@ namespace effect {
     TPL_2(ET1, ET2) struct ParEffectTerm;
 
     TPL_2(Self, T) struct EffectTerm {
-        typedef T EffectTarget;
-        TPL(ET) meth operator>>(ET other) -> inline SeqEffectTerm<Self, ET> {
+        TPL(ET) inline SeqEffectTerm<Self, ET> operator>>(ET other) {
             return SeqEffectTerm<Self, ET>(*((Self*) this), other);
         }
-        TPL(ET) meth operator||(ET other) -> inline ParEffectTerm<Self, ET> {
+        TPL(ET) inline ParEffectTerm<Self, ET> operator||(ET other) {
             return ParEffectTerm<Self, ET>(*((Self*) this), other);
         }
     };
 
     TPL(T) struct WrapEffectTerm : public EffectTerm<WrapEffectTerm<T>, T> {
+	typedef T EffectTarget;
         Effect<T>* effect;
         WrapEffectTerm(Effect<T>* effect)
             : effect(effect)
         {}
-        meth eval(Pool&) -> inline Effect<T>* {
+        inline Effect<T>* eval(Pool&) {
             return effect;
         }
     };
 
     TPL_2(ET1, ET2) struct SeqEffectTerm
         : public EffectTerm<SeqEffectTerm<ET1, ET2>, typename ET1::EffectTarget>
-        , public std::pair<ET1, ET2>
     {
+	typedef typename ET1::EffectTarget EffectTarget;
+	ET1 first;
+	ET2 second;
         SeqEffectTerm(ET1 first, ET2 second)
-            : std::pair<ET1, ET2>(first, second)
+            : first(first)
+	    , second(second)
         {}
-        meth eval(Pool& pool) -> inline Effect<EffectTarget>* {
+        inline Effect<EffectTarget>* eval(Pool& pool) {
             return new (pool.malloc()) Sequential<EffectTarget>(*first.eval(pool), *second.eval(pool));
         }
     };
 
     TPL_2(ET1, ET2) struct ParEffectTerm
         : public EffectTerm<ParEffectTerm<ET1, ET2>, typename ET1::EffectTarget>
-        , public std::pair<ET1, ET2>
     {
+	typedef typename ET1::EffectTarget EffectTarget;
+	ET1 first;
+	ET2 second;
         ParEffectTerm(ET1 first, ET2 second)
-            : std::pair<ET1, ET2>(first, second)
+            : first(first)
+	    , second(second)
         {}
-        meth eval(Pool& pool) -> inline Effect<EffectTarget>* {
+        inline Effect<EffectTarget>* eval(Pool& pool) {
             return new (pool.malloc()) Parallel<EffectTarget>(*first.eval(pool), *second.eval(pool));
         }
     };
 }
-
-#endif EFFECT_ALGEBRA

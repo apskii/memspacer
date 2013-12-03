@@ -1,5 +1,4 @@
-#ifndef SHADERS_DEFAULT
-#define SHADERS_DEFAULT
+#pragma once
 
 #include "../core/defs.hpp"
 #include "../core/shader.hpp"
@@ -26,5 +25,3 @@ namespace shaders {
         }
     };
 }
-
-#endif SHADERS_DEFAULT

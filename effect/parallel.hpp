@@ -1,5 +1,4 @@
-#ifndef CORE_EFFECT_PARALLEL_HPP
-#define CORE_EFFECT_PARALLEL_HPP
+#pragma once
 
 #include "../core/defs.hpp"
 #include "../core/effect.hpp"
@@ -18,11 +17,11 @@ namespace effect {
             , second(second)
             , first_done(false)
         {}
-        virt free(Pool& pool) -> void {
+        virtual void free(Pool& pool) {
             pool.free(&first);
             pool.free(&second);
         }
-        virt process(T& target, float delta) -> bool {
+        virtual bool process(T& target, float delta) {
             if (!first_done) {
                 if (first.process(target, delta))
                     first_done = true;
@@ -31,5 +30,3 @@ namespace effect {
         }
     };
 }
-
-#endif CORE_EFFECT_PARALLEL_HPP

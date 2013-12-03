@@ -1,10 +1,11 @@
 // Star Nest by Pablo Roman Andrioli
 // This content is under the MIT License.
+#version 130
 
-#define iterations 17
+#define iterations 10
 #define formuparam 0.530
 
-#define volsteps 18
+#define volsteps 14
 #define stepsize 0.100
 
 #define zoom   0.800
@@ -27,7 +28,7 @@ void main(void) {
 	float time=global_time*speed+.25;
 	vec3 from=vec3(1.,.5,0.5);
 	from+=vec3(time*2.,time,-2.);
-	
+
 	//volumetric rendering
 	float s=0.1,fade=1.;
 	vec3 v=vec3(0.);
@@ -50,5 +51,5 @@ void main(void) {
 		s+=stepsize;
 	}
 	v=mix(vec3(length(v)),v,saturation); //color adjust
-	gl_FragColor = vec4(v*.01,1.);	
+	gl_FragColor = vec4(v*.01,1.);
 }

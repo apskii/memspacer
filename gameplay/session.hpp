@@ -1,5 +1,4 @@
-#ifndef CORE_GAMEPLAY_SESSION
-#define CORE_GAMEPLAY_SESSION
+#pragma once
 
 #include <vector>
 #include <chrono>
@@ -30,7 +29,7 @@ namespace gameplay {
             cur_action = new (action_pool.malloc()) actions::Dance(rnd_gen());
             state = Start;
         }
-        meth process(float delta) -> bool {
+        bool process(float delta) {
             if (!cur_action->process(*this, delta)) {
                 action_pool.free(&cur_action);
                 if (state == End)
@@ -62,5 +61,3 @@ namespace gameplay {
         std::mt19937 rnd_gen;
     };
 }
-
-#endif CORE_GAMEPLAY_SESSION

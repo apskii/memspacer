@@ -1,5 +1,4 @@
-#ifndef CORE_SHADER
-#define CORE_SHADER
+#pragma once
 
 #include <initializer_list>
 #include <utility>
@@ -19,23 +18,27 @@ namespace core {
                 glAttachShader(shader_program, load(pair.first, pair.second));
             glLinkProgram(shader_program);
         }
-        meth use() inline const -> void { glUseProgram(shader_program); }
+        inline void use() const { glUseProgram(shader_program); }
     protected:
         const GLuint shader_program;
     private:
-        meth load(GLenum shader_type, std::string file_path) -> GLuint {
+        GLuint load(GLenum shader_type, std::string file_path) {
             using namespace std;
             ifstream ifs(file_path);
             stringstream buffer;
             buffer << ifs.rdbuf();
-            val  string = buffer.str();
-            val* source = string.c_str();
-            val  shader = glCreateShader(shader_type);
+            auto  string = buffer.str();
+            auto* source = string.c_str();
+            auto  shader = glCreateShader(shader_type);
             glShaderSource(shader, 1, &source, nullptr);
             glCompileShader(shader);
+	    GLint log_length;
+	    glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &log_length);
+	    GLchar* log = new GLchar[log_length + 1];
+	    glGetShaderInfoLog(shader, log_length, NULL, log);
+	    cerr << log << endl;
+	    delete[] log;
             return shader;
         }
     };
 }
-
-#endif CORE_SHADER

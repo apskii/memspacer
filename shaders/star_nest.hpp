@@ -1,5 +1,4 @@
-#ifndef SHADERS_STAR_NEST
-#define SHADERS_STAR_NEST
+#pragma once
 
 #include "../core/defs.hpp"
 #include "../core/shader.hpp"
@@ -16,5 +15,3 @@ namespace shaders {
         }
     };
 }
-
-#endif SHADERS_STAR_NEST

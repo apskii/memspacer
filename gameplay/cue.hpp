@@ -1,8 +1,5 @@
-#ifndef CORE_GAMEPLAY_CUE
-#define CORE_GAMEPLAY_CUE
+#pragma once
 
 namespace gameplay {
     struct Cue {};
 }
-
-#endif CORE_GAMEPLAY_CUE

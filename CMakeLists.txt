@@ -1,5 +1,5 @@
 project(memspacer)
-
 add_executable(memspacer main.cpp)
-
+add_definitions(-std=c++11)
+target_link_libraries(memspacer GL GLU GLEW glfw3 X11 Xxf86vm Xrandr pthread Xi)
 install(TARGETS memspacer RUNTIME DESTINATION bin)

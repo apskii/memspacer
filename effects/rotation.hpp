@@ -1,5 +1,4 @@
-#ifndef EFFECTS_ROTATION_HPP
-#define EFFECTS_ROTATION_HPP
+#pragma once
 
 #include "../core/defs.hpp"
 #include "../core/effect.hpp"
@@ -17,7 +16,7 @@ namespace effects {
             , orientation(orientation)
             , delta_sum(0.f)
         {}
-        virt process(Oriented& target, float delta) -> bool {
+        virtual bool process(Oriented& target, float delta) {
             static const auto unit = Quat();
             auto delta_step = delta / duration;
             delta_sum += delta_step;
@@ -34,9 +33,7 @@ namespace effects {
         CHECK_EFFECT(Rotation, Rotation<DummyOriented>);
     }
 
-    TPL(Oriented) func rotation(float duration, Quat orientation, Pool& pool) -> effect::WrapEffectTerm<Oriented> {
+    TPL(Oriented) effect::WrapEffectTerm<Oriented> rotation(float duration, Quat orientation, Pool& pool) {
         return effect::WrapEffectTerm<Oriented>(new (pool.malloc()) Rotation<Oriented>(duration, orientation));
     }
 }
-
-#endif EFFECTS_ROTATION_HPP
