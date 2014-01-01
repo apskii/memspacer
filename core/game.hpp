@@ -15,12 +15,14 @@ namespace core {
     class Game {
     private:
         GLFWwindow* window;
+        Configuration cfg;
         Pool effect_pool;
         RenderContext render_ctx;
         game_objects::Cube cube;
         game_objects::StarNest star_nest;
-        Game(GLFWwindow* window)
+        Game(GLFWwindow* window, Configuration cfg)
             : window(window)
+            , cfg(cfg)
             , cube(Vec3(0.f, 0.f, 0.f), glm::angleAxis(0.f, 0.f, 0.f, 1.f))
             , effect_pool(32)
             , render_ctx(
@@ -45,7 +47,8 @@ namespace core {
         void render() {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             cube.render(render_ctx);
-            star_nest.render(render_ctx);
+            if (cfg.useSpaceBg)
+              star_nest.render(render_ctx);
             glfwSwapBuffers(window);
         }
         void update(float delta) {
@@ -82,8 +85,8 @@ namespace core {
             exit(EXIT_FAILURE);
         }
     public:
-        static int run(core::Configuration cfg) {
-            Game game_ctx(init_ogl());
+        static int run(const core::Configuration& cfg) {
+            Game game_ctx(init_ogl(), cfg);
             float cur_time = glfwGetTime();
             for (;;) {
                 float new_time = glfwGetTime();
