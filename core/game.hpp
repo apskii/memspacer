@@ -6,6 +6,7 @@
 #include <sstream>
 #include "defs.hpp"
 #include "render_context.hpp"
+#include "configuration.hpp"
 #include "../effect/algebra.hpp"
 #include "../game_objects/cube.hpp"
 #include "../game_objects/star_nest.hpp"
@@ -81,7 +82,7 @@ namespace core {
             exit(EXIT_FAILURE);
         }
     public:
-        static int run() {
+        static int run(core::Configuration cfg) {
             Game game_ctx(init_ogl());
             float cur_time = glfwGetTime();
             for (;;) {
