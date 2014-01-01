@@ -16,9 +16,9 @@ namespace core {
     int interval;
   };
 
-  Configuration parse_configuration(std::vector<std::string> args) {
+  Configuration parse_configuration(const std::vector<std::string>& args) {
     Configuration cfg { 0, 1, false, false, false, false, 0, 0, 1, 1};
-    for (std::string& s : args) {
+    for (const std::string& s : args) {
       if (s == "-dm") {
 	cfg.mode = 0;
       } else if (s == "-sm") {
