@@ -2,7 +2,7 @@
 \subsection{Засоби розробки}
 
 Платформи:
-Цільовими платформами системи «Memspacer» є PC та Android. Такий вибір обумовлено великою популярністю цих платформ, і покриття ними досить великих сегментів десктопного та мобільного секторів.
+Цільовими платформами системи ``Memspacer'' є PC та Android. Такий вибір обумовлено великою популярністю цих платформ, і покриття ними досить великих сегментів десктопного та мобільного секторів.
 
 Операційні системи:
 Цільовими операційними системами є Windows і Linux, та можливо подальше портування на MacOS.
@@ -45,7 +45,9 @@
 
 \subsection{Архітектура програмного забезпечення}
 
-Ігровими об'єктами у системі «Memspacer» є дошка (Cube), її клітини (Cell), та сцена (StarNest). Вони відображені у нижченаведеній ієрархії:
+\subsubsection{Діаграми класів}
+
+Ігровими об'єктами у системі ``Memspacer'' є дошка (Cube), її клітини (Cell), та сцена (StarNest). Вони відображені у нижченаведеній ієрархії:
 
 \begin{center}
   \includegraphics[scale=0.6]{./cd-gameobjects.jpg}
@@ -72,3 +74,52 @@ Sequential<Target> комбінує два ефекти у новий ланцю
 \begin{center}
   \includegraphics[scale=0.6]{./cd-misc.jpg}
 \end{center}
+
+\subsubsection{Специфікація функцій}
+
+\small{
+  \begin{tabular}{| C{6cm} | C{4cm} | C{5cm} |}
+    \hline
+    Ідентифікатор & Тип & Опис \\
+    \hline
+    ``core/configuration.hpp'' \newline core:: \newline parse_configuration
+    & vector<string> $\to$ Configuration
+    & Формує об'єкт конфігурації із вектору параметрів командної строки \\
+    \hline
+    ``core/effect.hpp'' \newline core:: \newline Effect<T>::free \newline (pool)
+    & Pool\& $\to$ void
+    & Звільняє пам'ять, відведену під даний ефект у даному пулі \emph{pool} \\
+    \hline
+    ``core/effect.hpp'' \newline core:: \newline Effect<T>::process \newline (target, delta)
+    & (T\&, float) $\to$ bool
+    & Застосовує дію даного ефекту на проміжку часу \emph{delta} до цілі \emph{target} \\
+    \hline
+    ``core/game_object.hpp'' \newline core:: \newline
+    GameObject::update \newline (delta, pool)
+    & (float, Pool\&) $\to$ void
+    & Моделює розвиток стану об'єкту на проміжку часу \emph{delta} із пулом ефектів \emph{pool} \\
+    \hline
+    ``core/game_object.hpp'' \newline core:: \newline
+    GameObject::render \newline (render_ctx)
+    & RenderContext\& $\to$ void
+    & Виконує дії з графічного відображення даного об'єкту на екран
+      за заданого контексту рендерінгу \emph{render_ctx} \\
+    \hline
+    ``core/game_object.hpp'' \newline core:: \newline
+    GameObjectTemplate<Self>:: \newline update \newline (delta, pool)
+    & (float, Pool\&) $\to$ void
+    & Стандартна реалізація \emph{GameObject::render}, що поновлює із заданими параметрами усі ефекти, застосовані до даного ігрового об'єкту \\
+    \hline
+    ``core/game_object.hpp'' \newline core:: \newline
+    GameObjectTemplate<Self>:: \newline attach_effect \newline (effect)
+    & Effect<Self>\& $\to$ void
+    & Застосовує заданий ефект до даного ігрового об'єкту, та вносить його у список ефектів цього об'єкту \\
+    \hline
+    ``core/shader.hpp'' \newline core:: \newline
+    Shader::load \newline (shader_type, file_path)
+    & (GLenum, string) $\to$ GLuint
+    & Завантажує шейдер заданого типу \emph{shader_type} із файлу, розташованого за шляхом \emph{file_path}, і повертає його ідентифікатор \\
+    \hline
+  \end{tabular}
+% GLuint load(GLenum shader_type, std::string file_path)
+}

@@ -1,7 +1,20 @@
 \documentclass[russian,ukrainian,utf8,simple]{eskdtext}
 \usepackage[hyphens]{url}
+\usepackage{array}
 \usepackage{graphicx}
 \usepackage{verbatim}
+\usepackage{underscore}
+\usepackage{fontspec}
+% \usepackage{xunicode}
+\usepackage{xecyr}
+% \usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\defaultfontfeatures{Ligatures=TeX}
+\setromanfont{Charis SIL}
+\setsansfont{Liberation Sans}
+\setmonofont{DejaVu Sans Mono}
+% \usepackage[babel=true]{microtype}
 % \ESKDdepartment{1111}
 % \ESKDcompany{2222}
 % \ESKDclassCode{3333}
@@ -14,6 +27,7 @@
 % \ESKDtitleDesignedBy{}{555}
 % \ESKDtitleDesignedBy{Руководитель разработки}{Лист~А.~А}
 \ESKDstyle{formIIab}
+\newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
 \begin{document}
 %\maketitle
 \tableofcontents
