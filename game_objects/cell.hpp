@@ -42,13 +42,13 @@ namespace game_objects {
             , parent(parent)
             , color(color)
         {}
-        virtual void render(const core::RenderContext& ctx) {
+        virtual void render(const core::RenderContext& render_ctx) {
             static CellVertices cell_vertices;
-            auto mv = ctx.view *
+            auto mv = render_ctx.view *
 	      glm::translate(parent->orientation * this->position) *
 	      glm::toMat4(this->orientation * parent->orientation);
-            auto mvp = ctx.proj * mv;
-            auto& shader = ctx.default_shader;
+            auto mvp = render_ctx.proj * mv;
+            auto& shader = render_ctx.default_shader;
             glUniformMatrix4fv(shader.mv, 1, false, &mv[0][0]);
             glUniformMatrix4fv(shader.mvp, 1, false, &mvp[0][0]);
             glUniform1f(shader.scale, parent->cell_size);

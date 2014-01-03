@@ -12,7 +12,7 @@ namespace effect {
     TPL_2(ET1, ET2) struct SeqEffectTerm;
     TPL_2(ET1, ET2) struct ParEffectTerm;
 
-    TPL_2(Self, T) struct EffectTerm {
+    TPL(Self) struct EffectTerm {
         TPL(ET) inline SeqEffectTerm<Self, ET> operator>>(ET other) {
             return SeqEffectTerm<Self, ET>(*((Self*) this), other);
         }
@@ -21,7 +21,7 @@ namespace effect {
         }
     };
 
-    TPL(T) struct WrapEffectTerm : public EffectTerm<WrapEffectTerm<T>, T> {
+    TPL(T) struct WrapEffectTerm : public EffectTerm<WrapEffectTerm<T>> {
 	typedef T EffectTarget;
         Effect<T>* effect;
         WrapEffectTerm(Effect<T>* effect)
@@ -33,7 +33,7 @@ namespace effect {
     };
 
     TPL_2(ET1, ET2) struct SeqEffectTerm
-        : public EffectTerm<SeqEffectTerm<ET1, ET2>, typename ET1::EffectTarget>
+        : public EffectTerm<SeqEffectTerm<ET1, ET2>>
     {
 	typedef typename ET1::EffectTarget EffectTarget;
 	ET1 first;
@@ -48,7 +48,7 @@ namespace effect {
     };
 
     TPL_2(ET1, ET2) struct ParEffectTerm
-        : public EffectTerm<ParEffectTerm<ET1, ET2>, typename ET1::EffectTarget>
+        : public EffectTerm<ParEffectTerm<ET1, ET2>>
     {
 	typedef typename ET1::EffectTarget EffectTarget;
 	ET1 first;
