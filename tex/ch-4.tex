@@ -75,188 +75,336 @@ Sequential<Target> комбінує два ефекти у новий ланцю
   \includegraphics[scale=0.6]{./cd-misc.jpg}
 \end{center}
 
-\subsubsection{Специфікація функцій}
+\subsection{Специфікація функцій}
 
-\small{
-  \begin{longtable}{| C{6cm} | C{4cm} | C{5cm} |}
-    \hline
-    Ідентифікатор & Тип & Опис \\
+\subsubsection{Функції програми моделювання}
 
-    %%%%%% core/...
-    \hline
-    ``core/configuration.hpp'' \newline core:: \newline parse_configuration \newline (args)
-    & vector<string> $\to$ Configuration
-    & Формує об'єкт конфігурації із вектору параметрів командної строки \emph{args} \\
-    \hline
-    ``core/effect.hpp'' \newline core:: \newline Effect<T>::free \newline (pool)
-    & Pool\& $\to$ void
-    & Звільняє пам'ять, відведену під даний ефект у даному пулі \emph{pool} \\
-    \hline
-    ``core/effect.hpp'' \newline core:: \newline Effect<T>::process \newline (target, delta)
-    & (T\&, float) $\to$ bool
-    & Застосовує дію даного ефекту на проміжку часу \emph{delta}
-    до цілі \emph{target} та повертає логічне значення, що показує,
-    чи завершився час дії ефекту після даної ітерації моделювання \\
-    \hline
-    ``core/render_context.hpp'' \newline core:: \newline
-    RenderContext::new \newline (view, proj)
-    & (const Mat4\&, const Mat4\&) $\to$ RenderContext
-    & Конструює контекст рендерінгу з заданими початковими
-    матрицями виду \emph{view} і проекції \emph{proj} \\
+\small\begin{longtable}{| C{6cm} | C{4cm} | C{5cm} |}
+  \hline
+  Ідентифікатор & Тип & Опис \\
 
-    %%%%%% core/game_object
-    \hline
-    ``core/game_object.hpp'' \newline core:: \newline
-    GameObject::update \newline (delta, pool)
-    & (float, Pool\&) $\to$ void
-    & Моделює розвиток стану об'єкту на проміжку часу
-    \emph{delta} із пулом ефектів \emph{pool} \\
-    \hline
-    ``core/game_object.hpp'' \newline core:: \newline
-    GameObject::render \newline (render_ctx)
-    & RenderContext\& $\to$ void
-    & Виконує дії з графічного відображення даного об'єкту на екран
-      за заданого контексту рендерінгу \emph{render_ctx} \\
-    \hline
-    ``core/game_object.hpp'' \newline core:: \newline
-    GameObjectTemplate<Self>:: \newline update \newline (delta, pool)
-    & (float, Pool\&) $\to$ void
-    & Стандартна реалізація \emph{GameObject::render},
-    що поновлює із заданими параметрами усі ефекти,
-    застосовані до даного ігрового об'єкту \\
-    \hline
-    ``core/game_object.hpp'' \newline core:: \newline
-    GameObjectTemplate<Self>:: \newline attach_effect \newline (effect)
-    & Effect<Self>\& $\to$ void
-    & Застосовує заданий ефект до даного ігрового об'єкту,
-    та вносить його у список ефектів цього об'єкту \\
+  %%%%%% core/...
+  \hline
+  ``core/configuration.hpp'' \newline core:: \newline parse_configuration \newline (args)
+  & vector<string> $\to$ Configuration
+  & Формує об'єкт конфігурації із вектору параметрів командної строки \emph{args} \\
+  \hline
+  ``core/effect.hpp'' \newline core:: \newline Effect<T>::free \newline (pool)
+  & Pool\& $\to$ void
+  & Звільняє пам'ять, відведену під даний ефект у даному пулі \emph{pool} \\
+  \hline
+  ``core/effect.hpp'' \newline core:: \newline Effect<T>::process \newline (target, delta)
+  & (T\&, float) $\to$ bool
+  & Застосовує дію даного ефекту на проміжку часу \emph{delta}
+  до цілі \emph{target} та повертає логічне значення, що показує,
+  чи завершився час дії ефекту після даної ітерації моделювання \\
+  \hline
+  ``core/render_context.hpp'' \newline core:: \newline
+  RenderContext::new \newline (view, proj)
+  & (const Mat4\&, const Mat4\&) $\to$ RenderContext
+  & Конструює контекст рендерінгу з заданими початковими
+  матрицями виду \emph{view} і проекції \emph{proj} \\
 
-    %%%%%% core/shader
-    \hline
-    ``core/shader.hpp'' \newline core:: \newline
-    Shader::load \newline (shader_type, file_path)
-    & (GLenum, string) $\to$ GLuint
-    & Завантажує шейдер заданого типу \emph{shader_type} із файлу,
-    розташованого за шляхом \emph{file_path}, і повертає його ідентифікатор \\
-    \hline
-    ``core/shader.hpp'' \newline core:: \newline
-    Shader::use
-    & void
-    & Встановлює даний шейдер частиною поточного стану рендерінгу \\
-    \hline
-    ``core/shader.hpp'' \newline core:: \newline
-    Shader::new \newline (descriptions)
-    & initializer_list \newline <(GLenum,string)> \newline $\to$ Shader
-    & Конструює шейдерну програму із набору пар-описів, кожна з яких
-    складається з типу шейдеру та шляху до його файлу \\
+  %%%%%% core/game_object
+  \hline
+  ``core/game_object.hpp'' \newline core:: \newline
+  GameObject::update \newline (delta, pool)
+  & (float, Pool\&) $\to$ void
+  & Моделює розвиток стану об'єкту на проміжку часу
+  \emph{delta} із пулом ефектів \emph{pool} \\
+  \hline
+  ``core/game_object.hpp'' \newline core:: \newline
+  GameObject::render \newline (render_ctx)
+  & RenderContext\& $\to$ void
+  & Виконує дії з графічного відображення даного об'єкту на екран
+  за заданого контексту рендерінгу \emph{render_ctx} \\
+  \hline
+  ``core/game_object.hpp'' \newline core:: \newline
+  GameObjectTemplate<Self>:: \newline update \newline (delta, pool)
+  & (float, Pool\&) $\to$ void
+  & Стандартна реалізація \emph{GameObject::render},
+  що поновлює із заданими параметрами усі ефекти,
+  застосовані до даного ігрового об'єкту \\
+  \hline
+  ``core/game_object.hpp'' \newline core:: \newline
+  GameObjectTemplate<Self>:: \newline attach_effect \newline (effect)
+  & Effect<Self>\& $\to$ void
+  & Застосовує заданий ефект до даного ігрового об'єкту,
+  та вносить його у список ефектів цього об'єкту \\
 
-    %%%%%% effect/parallel
-    \hline
-    ``effect/parallel.hpp'' \newline effect:: \newline
-    Parallel<T>::new \newline (first, second)
-    & (Effect<T>\&, Effect<T>\&) $\to$ Effect
-    & Паралельна композиція ефектів \emph{first} та \emph{second} \\
-    \hline
-    ``effect/parallel.hpp'' \newline effect:: \newline
-    Parallel<T>::free \newline (pool)
-    & Pool\& $\to$ void
-    & Звільняє пам'ять, відведену під даний ефект, та його складові ефекти, у даному пулі \\
-    \hline
-    ``effect/parallel.hpp'' \newline effect:: \newline Parallel<T>::process \newline (target, delta)
-    & (T\&, float) $\to$ bool
-    & Застосовує дію даної композиції ефектів на проміжку часу \emph{delta}
-    до цілі \emph{target} та повертає логічне значення, що показує,
-    чи завершився час дії ефектів після даної ітерації моделювання \\
+  %%%%%% core/shader
+  \hline
+  ``core/shader.hpp'' \newline core:: \newline
+  Shader::load \newline (shader_type, file_path)
+  & (GLenum, string) $\to$ GLuint
+  & Завантажує шейдер заданого типу \emph{shader_type} із файлу,
+  розташованого за шляхом \emph{file_path}, і повертає його ідентифікатор \\
+  \hline
+  ``core/shader.hpp'' \newline core:: \newline
+  Shader::use
+  & void
+  & Встановлює даний шейдер частиною поточного стану рендерінгу \\
+  \hline
+  ``core/shader.hpp'' \newline core:: \newline
+  Shader::new \newline (descriptions)
+  & initializer_list \newline <(GLenum,string)> \newline $\to$ Shader
+  & Конструює шейдерну програму із набору пар-описів, кожна з яких
+  складається з типу шейдеру та шляху до його файлу \\
 
-    %%%%%% effect/sequential
-    \hline
-    ``effect/sequential.hpp'' \newline effect:: \newline
-    Sequential<T>::new \newline (first, second)
-    & (Effect<T>\&, Effect<T>\&) $\to$ Effect
-    & Послідовна композиція ефектів \emph{first} та \emph{second} \\
-    \hline
-    ``effect/sequential.hpp'' \newline effect:: \newline
-    Sequential<T>::free \newline (pool)
-    & Pool\& $\to$ void
-    & Звільняє пам'ять, відведену під даний ефект, та його складові ефекти, у даному пулі \\
-    \hline
-    ``effect/sequential.hpp'' \newline effect:: \newline Sequential<T>::process \newline (target, delta)
-    & (T\&, float) $\to$ bool
-    & Застосовує дію даної композиції ефектів на проміжку часу \emph{delta}
-    до цілі \emph{target} та повертає логічне значення, що показує,
-    чи завершився час дії ефектів після даної ітерації моделювання \\
+  %%%%%% effect/parallel
+  \hline
+  ``effect/parallel.hpp'' \newline effect:: \newline
+  Parallel<T>::new \newline (first, second)
+  & (Effect<T>\&, Effect<T>\&) $\to$ Effect
+  & Паралельна композиція ефектів \emph{first} та \emph{second} \\
+  \hline
+  ``effect/parallel.hpp'' \newline effect:: \newline
+  Parallel<T>::free \newline (pool)
+  & Pool\& $\to$ void
+  & Звільняє пам'ять, відведену під даний ефект, та його складові ефекти, у даному пулі \\
+  \hline
+  ``effect/parallel.hpp'' \newline effect:: \newline Parallel<T>::process \newline (target, delta)
+  & (T\&, float) $\to$ bool
+  & Застосовує дію даної композиції ефектів на проміжку часу \emph{delta}
+  до цілі \emph{target} та повертає логічне значення, що показує,
+  чи завершився час дії ефектів після даної ітерації моделювання \\
 
-    %%%%%% effect/algebra
-    \hline
-    ``effect/algebra.hpp'' \newline effect:: \newline EffectTerm<Self>:: \newline
-    (||)<ET> \newline (other)
-    & ET $\to$ \newline ParEffectTerm \newline <Self, ET>
-    & Комбінатор термів паралельної композиції ефектів \\
-    \hline
-    ``effect/algebra.hpp'' \newline effect:: \newline EffectTerm<Self>:: \newline
-    (>>)<ET> \newline (other)
-    & ET $\to$ \newline SeqEffectTerm \newline <Self, ET>
-    & Комбінатор термів послідовної композиції ефектів \\
-    \hline
-    ``effect/algebra.hpp'' \newline effect:: \newline WrapEffectTerm<T>:: \newline
-    eval \newline (pool)
-    & Pool\& $\to$ Effect<T>*
-    & Інтерпретує врапаючі терми підмови опису ефектів з заданим пулом \\
-    \hline
-    ``effect/algebra.hpp'' \newline effect:: \newline ParEffectTerm<ET1,ET2>:: \newline
-    eval \newline (pool)
-    & Pool\& $\to$ Effect<T>*
-    & Інтерпретує паралельно-композиційні терми підмови опису ефектів з заданим пулом \\
-    \hline
-    ``effect/algebra.hpp'' \newline effect:: \newline SeqEffectTerm<ET1,ET2>:: \newline
-    eval \newline (pool)
-    & Pool\& $\to$ Effect<T>*
-    & Інтерпретує послідовно-композиційні терми підмови опису ефектів з заданим пулом \\
+  %%%%%% effect/sequential
+  \hline
+  ``effect/sequential.hpp'' \newline effect:: \newline
+  Sequential<T>::new \newline (first, second)
+  & (Effect<T>\&, Effect<T>\&) $\to$ Effect
+  & Послідовна композиція ефектів \emph{first} та \emph{second} \\
+  \hline
+  ``effect/sequential.hpp'' \newline effect:: \newline
+  Sequential<T>::free \newline (pool)
+  & Pool\& $\to$ void
+  & Звільняє пам'ять, відведену під даний ефект, та його складові ефекти, у даному пулі \\
+  \hline
+  ``effect/sequential.hpp'' \newline effect:: \newline Sequential<T>::process \newline (target, delta)
+  & (T\&, float) $\to$ bool
+  & Застосовує дію даної композиції ефектів на проміжку часу \emph{delta}
+  до цілі \emph{target} та повертає логічне значення, що показує,
+  чи завершився час дії ефектів після даної ітерації моделювання \\
 
-    %%%%%% effects/rotation
-    \hline
-    ``effects/rotation.hpp'' \newline effects:: \newline Rotation<Oriented>:: \newline
-    new \newline (duration, orientation)
-    & (float, Quat) $\to$ Rotation<Oriented>
-    & Конструює ефект обертання з заданою тривалістю \emph{duration}
-    та кватерніоном оберту \emph{orientation} \\
-    \hline
-    ``effects/rotation.hpp'' \newline effects:: \newline Rotation<Oriented>:: \newline
-    process \newline (target, delta)
-    & (Oriented\&, float) $\to$ bool
-    & Застосовує описуєме даним об'єктом обертання на проміжку часу \emph{delta}
-    до цілі \emph{target} та повертає логічне значення, що показує,
-    чи завершився час дії ефекту після даної ітерації моделювання \\
+  %%%%%% effect/algebra
+  \hline
+  ``effect/algebra.hpp'' \newline effect:: \newline EffectTerm<Self>:: \newline
+  (||)<ET> \newline (other)
+  & ET $\to$ \newline ParEffectTerm \newline <Self, ET>
+  & Комбінатор термів паралельної композиції ефектів \\
+  \hline
+  ``effect/algebra.hpp'' \newline effect:: \newline EffectTerm<Self>:: \newline
+  (>>)<ET> \newline (other)
+  & ET $\to$ \newline SeqEffectTerm \newline <Self, ET>
+  & Комбінатор термів послідовної композиції ефектів \\
+  \hline
+  ``effect/algebra.hpp'' \newline effect:: \newline WrapEffectTerm<T>:: \newline
+  eval \newline (pool)
+  & Pool\& $\to$ Effect<T>*
+  & Інтерпретує врапаючі терми підмови опису ефектів з заданим пулом \\
+  \hline
+  ``effect/algebra.hpp'' \newline effect:: \newline ParEffectTerm<ET1,ET2>:: \newline
+  eval \newline (pool)
+  & Pool\& $\to$ Effect<T>*
+  & Інтерпретує паралельно-композиційні терми підмови опису ефектів з заданим пулом \\
+  \hline
+  ``effect/algebra.hpp'' \newline effect:: \newline SeqEffectTerm<ET1,ET2>:: \newline
+  eval \newline (pool)
+  & Pool\& $\to$ Effect<T>*
+  & Інтерпретує послідовно-композиційні терми підмови опису ефектів з заданим пулом \\
 
-    %%%%%% effects/blink
-    \hline
-    ``effects/blink.hpp'' \newline effects:: \newline Blink<Colored>:: \newline
-    new \newline (duration, color)
-    & (float, Vec4) $\to$ Rotation<Oriented>
-    & Конструює ефект блимання з заданою тривалістю \emph{duration} та кольором \emph{color} \\
-    \hline
-    ``effects/blink.hpp'' \newline effects:: \newline Blink<Colored>:: \newline
-    process \newline (target, delta)
-    & (Colored\&, float) $\to$ bool
-    & Застосовує описуєме даним об'єктом блимання на проміжку часу \emph{delta}
-    до цілі \emph{target} та повертає логічне значення, що показує,
-    чи завершився час дії ефекту після даної ітерації моделювання \\
+  %%%%%% effects/rotation
+  \hline
+  ``effects/rotation.hpp'' \newline effects:: \newline Rotation<Oriented>:: \newline
+  new \newline (duration, orientation)
+  & (float, Quat) $\to$ Rotation<Oriented>
+  & Конструює ефект обертання з заданою тривалістю \emph{duration}
+  та кватерніоном оберту \emph{orientation} \\
+  \hline
+  ``effects/rotation.hpp'' \newline effects:: \newline Rotation<Oriented>:: \newline
+  process \newline (target, delta)
+  & (Oriented\&, float) $\to$ bool
+  & Застосовує описуєме даним об'єктом обертання на проміжку часу \emph{delta}
+  до цілі \emph{target} та повертає логічне значення, що показує,
+  чи завершився час дії ефекту після даної ітерації моделювання \\
 
-    %%%%%% game_objects/cell
-    \hline
-    ``game_objects/cell.hpp'' \newline game_objects:: \newline Cell<Owner>:: \newline
-    new \newline (parent, position, orientation, color)
-    & (Owner*, Vec3, Quat, Vec4) $\to$ Cell<Owner>
-    & Конструює клітину дошки із заданими дошкою \emph{parent},
-    розташуванням \emph{position},  орієнтацією \emph{orientation},
-    та кольором \emph{color} \\
-    \hline
-    ``game_objects/cell.hpp'' \newline game_objects:: \newline Cell<Owner>:: \newline
-    render \newline (render_ctx)
-    & const RenderContext\& $\to$ void
-    & Виконує дії з графічного відображення даного об'єкту на екран
-      за заданого контексту рендерінгу \emph{render_ctx} \\
+  %%%%%% effects/blink
+  \hline
+  ``effects/blink.hpp'' \newline effects:: \newline Blink<Colored>:: \newline
+  new \newline (duration, color)
+  & (float, Vec4) $\to$ Rotation<Oriented>
+  & Конструює ефект блимання з заданою тривалістю \emph{duration} та кольором \emph{color} \\
+  \hline
+  ``effects/blink.hpp'' \newline effects:: \newline Blink<Colored>:: \newline
+  process \newline (target, delta)
+  & (Colored\&, float) $\to$ bool
+  & Застосовує описуєме даним об'єктом блимання на проміжку часу \emph{delta}
+  до цілі \emph{target} та повертає логічне значення, що показує,
+  чи завершився час дії ефекту після даної ітерації моделювання \\
 
-    \hline
-  \end{longtable}
-}
+  %%%%%% game_objects/cell
+  \hline
+  ``game_objects/cell.hpp'' \newline game_objects:: \newline Cell<Owner>:: \newline
+  new \newline (parent, position, orientation, color)
+  & (Owner*, Vec3, Quat, Vec4) $\to$ Cell<Owner>
+  & Конструює клітину дошки із заданими дошкою \emph{parent},
+  розташуванням \emph{position},  орієнтацією \emph{orientation},
+  та кольором \emph{color} \\
+  \hline
+  ``game_objects/cell.hpp'' \newline game_objects:: \newline Cell<Owner>:: \newline
+  render \newline (render_ctx)
+  & const RenderContext\& $\to$ void
+  & Виконує дії з графічного відображення клітини дошки на екран
+  за заданого контексту рендерінгу \emph{render_ctx} \\
+
+  %%%%%% game_objects/cube
+  \hline
+  ``game_objects/cube.hpp'' \newline game_objects:: \newline Cube:: \newline
+  new \newline (position, orientation)
+  & (Vec3, Quat) $\to$ Cube
+  & Конструює дошку із заданими розташуванням \emph{position} і орієнтацією \emph{orientation} \\
+  \hline
+  ``game_objects/cube.hpp'' \newline game_objects:: \newline Cube:: \newline
+  render \newline (render_ctx)
+  & const RenderContext\& $\to$ void
+  & Виконує дії з графічного відображення дошки на екран
+  за заданого контексту рендерінгу \emph{render_ctx} \\
+  \hline
+  ``game_objects/cube.hpp'' \newline game_objects:: \newline Cube:: \newline
+  update \newline (delta, pool)
+  & (float, Pool\&) $\to$ void
+  & Моделює розвиток стану дошки на проміжку часу \emph{delta} із пулом ефектів \emph{pool} \\
+
+  %%%%%% game_objects/star_nest
+  \hline
+  ``game_objects/star_nest.hpp'' \newline game_objects:: \newline StarNest:: \newline
+  new
+  & StarNest
+  & Конструює зоряне небо \\
+  \hline
+  ``game_objects/star_nest.hpp'' \newline game_objects:: \newline StarNest:: \newline
+  render \newline (render_ctx)
+  & const RenderContext\& $\to$ void
+  & Виконує дії з графічного відображення зоряного неба на екран
+  за заданого контексту рендерінгу \emph{render_ctx} \\
+
+  %%%%%% shaders/...
+  \hline
+  ``shaders/default.hpp'' \newline shaders:: \newline Default:: \newline
+  new
+  & shaders::Default
+  & Конструює стандартний шейдер, що відповідає за освітлення
+  і кольори клітин та їх MVP перетворення \\
+  \hline
+  ``shaders/star_nest.hpp'' \newline shaders:: \newline StarNest:: \newline
+  new
+  & shaders::StarNest
+  & Конструює шейдер зоряного неба \\
+
+  %%%%%% core/game
+  \hline
+  ``core/game.hpp'' \newline core:: \newline Game:: \newline
+  init_ogl
+  & GLFWWindow*
+  & Ініціалізує OpenGL, GLFW, та GLEW \\
+  \hline
+  ``core/game.hpp'' \newline core:: \newline Game:: \newline
+  new \newline (window, cfg)
+  & (GLFWWindow*, Configuration) $\to$ Game
+  & Конструює ігровий контекст із заданими вікном \emph{window}
+  та конфігурацією \emph{cfg} \\
+  \hline
+  ``core/game.hpp'' \newline core:: \newline Game:: \newline
+  die
+  & void
+  & Примусово завершує моделювання \\
+  \hline
+  ``core/game.hpp'' \newline core:: \newline Game:: \newline
+  render
+  & void
+  & Виконує ітерацію рендерингу усіх об'єктів моделювання \\
+  \hline
+  ``core/game.hpp'' \newline core:: \newline Game:: \newline
+  update \newline (delta)
+  & float $\to$ void
+  & Моделює розвиток стану усієї системи на проміжку часу \emph{delta} \\
+  \hline
+  ``core/game.hpp'' \newline core:: \newline Game:: \newline
+  run \newline (cfg)
+  & const Configuration\& $\to$ int
+  & Запускає моделювання з заданою конфігурацією \\
+  \hline
+\end{longtable}\normalsize
+\newpage
+\subsubsection{Функції програми конфігурування та перегляду історії}
+
+\small\begin{longtable}{| C{6cm} | C{4cm} | C{5cm} |}
+  \hline
+  Ідентифікатор & Тип & Опис \\
+  \hline
+  ``MemspacerUI.hs'' \newline (<:=) \newline ref val
+  & IORef a $\to$ a $\to$ IO ()
+  & Операторний синонім до writeIORef: записує значення \emph{val}
+  у IO-змінну \emph{ref} \\
+  \hline
+  ``MemspacerUI.hs'' \newline (<:<) \newline ref mval
+  & IORef a $\to$ IO a $\to$ IO ()
+  & Комбінація монадичного зв'язування і (<:=):
+  запускає монадичне обчислення \emph{mval} і записує
+  у IO-змінну \emph{ref} його результат \\
+  \hline
+  ``MemspacerUI.hs'' \newline cmdArgs \newline cfg
+  & Config $\to$ String
+  & Перетворює об'єкт конфігурації у строку параметрів командної строки \\
+  \hline
+  ``MemspacerUI.hs'' \newline activeProfile
+  & SqlPersistM String
+  & Отримує з бази даних ім'я активного профілю \\
+  \hline
+  ``MemspacerUI.hs'' \newline configFor \newline profile
+  & String $\to$ SqlPersistM (Key Config, Config)
+  & Отримує з бази даних конфігурацію для профіля з ім'ям \emph{profile} \\
+  \hline
+  ``MemspacerUI.hs'' \newline activeConfig
+  & SqlPersistM (Key Config, Config)
+  & Отримує з бази даних активну конфігурацію \\
+  \hline
+  ``MemspacerUI.hs'' \newline db
+  & SqlPersistM a $\to$ IO a
+  & Запускає SqlPersist-монадичне обчислення у IO-монаді \\
+  \hline
+  ``MemspacerUI.hs'' \newline whenM \newline mb action
+  & Monad m $\Rightarrow$ m Bool $\to$ m () $\to$ m ()
+  & Запускає монадичне обчислення \emph{mb} і у разі істинності
+  отриманого результату запускає монадичне обчислення \emph{action} \\
+  \hline
+  ``MemspacerUI.hs'' \newline toolButtonClicked
+  & Signal ToolButton (IO ())
+  & Сигнал, що виникає при натисненні на ToolButton \\
+  \hline
+  ``MemspacerUI.hs'' \newline ($\sim$\$) \newline widget signal action
+  & obj \newline $\to$ Signal obj cb \newline
+  $\to$ (obj $\to$ cb) \newline $\to$ IO (ConnectId obj)
+  & Встановлює реакцію \emph{action} на сигнал \emph{signal} віджету \emph{widget} \\
+  \hline
+  ``MemspacerUI.hs'' \newline columnInserter \newline treeView model
+  & TreeView -> ListStore s -> ColumnInserter s
+  & Створює фабрику колонок для даного дерева та моделі \\
+  \hline
+  ``MemspacerUI.hs'' \newline initHistory \newline historyTV
+  & TreeView -> IO (ListStore Session)
+  & Ініціалізує дерево \emph{historyTV} для відображення історії тренувань,
+  створює, прив'язує до дерева, і повертає необхідну модель даних \\
+  \hline
+  ``MemspacerUI.hs'' \newline addProfileDialog
+  & IO (IO (Maybe String))
+  & Конструює діалог створення профілю, що повертає і'мя нового профілю \\
+  \hline
+  ``MemspacerUI.hs'' \newline memspacerUI \newline
+  initialConfig initialProfilesList
+  & (Key Config, Config) -> [String] -> IO ()
+  & Ініціалізує інтерфейс конфігурування і перегляду історії
+  з заданими початковою конфігурацією та початковим списком профілів \\
+  \hline
+\end{longtable}\normalsize

@@ -23,14 +23,14 @@ namespace game_objects {
                 for (int y = 0; y < 3; ++y)
                     for (int z = 0; z < 3; ++z)
                         cells[x][y][z] = C(
-                        this,
-                        Vec3 {
+                          this,
+                          Vec3 {
                             position.x + x * dp,
                             position.y + y * dp,
                             position.z + z * dp
-                    },
-                    glm::angleAxis(0.f, 0.f, 0.f, 1.f)
-                    );
+                          },
+                          glm::angleAxis(0.f, 0.f, 0.f, 1.f)
+                        );
         }
         virtual void render(const core::RenderContext& ctx) {
             C* cells_ptr = &cells[0][0][0];
