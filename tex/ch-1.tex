@@ -43,7 +43,7 @@
 
 \begin{figure}[here]
   \caption{Діаграма діяльності}
-  \centering\includegraphics[scale=0.6]{./diagrams/activity.png}
+  \centering\includegraphics[scale=0.6]{./diagrams/activity.eps}
   \label{fig:activity}
 \end{figure}
 
@@ -56,7 +56,7 @@
 
 \begin{itemize}
   \item Управління профілями:
-    \begin{itemize}
+    \begin{itemize}[leftmargin=24pt]
       \item Вибір поточного профілю
       \item Створення профілю
       \item Видалення профілю
@@ -64,37 +64,37 @@
       \item Відміна змін профілю
     \end{itemize}
   \item Конфігурування:
-    \begin{itemize}
+    \begin{itemize}[leftmargin=24pt]
       \item Зміна режиму:
-        \begin{itemize}
+        \begin{itemize}[leftmargin=24pt]
           \item Вибір режиму ``Звичайний K-N-Back''
           \item Вибір режиму ``K-N-Back з обертами і здвигами за модулем''
         \end{itemize}
       \item Зміна довжини буферів ознак (N)
       \item Вибір додаткових просторових перетворень:
-        \begin{itemize}
+        \begin{itemize}[leftmargin=24pt]
           \item (Де)активація Z-обертів лицевою гранню
         \end{itemize}
       \item Вибір додаткових ознак:
-        \begin{itemize}
+        \begin{itemize}[leftmargin=24pt]
           \item (Де)активація використання ознаки кольору блимання клітин
           \item (Де)активація використання ознаки звуку оголошеної літери
         \end{itemize}
       \item Зміна графічних опцій:
-        \begin{itemize}
+        \begin{itemize}[leftmargin=24pt]
           \item Де(активація) використання космічного фону
           \item Зміна кольору активації (клітин)
           \item Зміна кольору спокою (клітин)
         \end{itemize}
       \item Зміна таймінгів:
-        \begin{itemize}
+        \begin{itemize}[leftmargin=24pt]
           \item Зміна часу активації
           \item Зміна інтервалів
         \end{itemize}
     \end{itemize}
   \item Перегляд історії тренувань
   \item Тренування
-    \begin{itemize}
+    \begin{itemize}[leftmargin=24pt]
       \item Запам'ятання ознак
         \begin{itemize}
           \item Запамятання позиції
@@ -102,7 +102,7 @@
           \item Запамятання звуку
         \end{itemize}
       \item Сигналізація співпадіння ознак
-        \begin{itemize}
+        \begin{itemize}[leftmargin=24pt]
           \item Сигналізація співпадіння позиції
           \item Сигналізація співпадіння кольору
           \item Сигналізація співпадіння звуку
@@ -111,19 +111,30 @@
 \end{itemize}
 
 \begin{figure}[here]
-  \caption{Діаграма прецедентів}
-  \centering\includegraphics[scale=0.5]{./diagrams/usecase.png}
-  \label{fig:usecase}
+  \centering\includegraphics[scale=0.5]{./diagrams/usecase-top.eps}
+  \caption{Діаграма прецедентів верхнього рівня}
+\end{figure}
+
+\begin{figure}[here]
+  \centering\includegraphics[scale=0.6]{./diagrams/usecase-config.eps}
+  \caption{Діаграма прецедентів конфігурування}
+\end{figure}
+
+\begin{figure}[here]
+  \centering\includegraphics[scale=0.6]{./diagrams/usecase-profiles.eps}
+  \caption{Діаграма прецедентів управління профілями}
+\end{figure}
+
+\begin{figure}[here]
+  \centering\includegraphics[scale=0.6]{./diagrams/usecase-training.eps}
+  \caption{Діаграма прецедентів тренування}
 \end{figure}
 
 \subsection{Огляд наявних аналогів}
 
-Класичну вправу та деякий клас її мікромодифікацій можна узагальнити до K-N-Back, сутність якого полягає у тому, що користувачу послідовно показується ряд груп образів по K за раз, і на кожному кроці користувач повинен визначити, які з поточно-показаних K образів були показані рівно N кроків назад, натиснувши відповідні кожному з них кнопки. Таким чином, у термінології інженерії програмного забезпечення, гра полягає у тому, щоб тримати у пам'яті K буферів довжини N, і на кожному кроці класти у кожний з них по новому елементу, здвигаючи усі інші і відкидуючи останні.
-
-У найбільш поширеному варіанті вправи — Dual-N-Back — як можна здогадатися, K дорівнює 2. Як правило, образами у реалізації такого варіанту є візуальний — підсвічена клітина на дошці, та аудіо — озвучена літера.
-
 \subsubsection{Браузерні реалізації}
 \small\begin{longtable}{| C{5cm} | C{2cm} | C{2.5cm} | C{5cm} |}
+  \captionsetup{justification=centering}\caption{} \\
   \hline
   Назва/ресурс & Тип & Платформа & Особливості \\
   \hline
@@ -153,6 +164,7 @@
 ~\newline
 \subsubsection{Мобільні реалізації}
 \small\begin{longtable}{| C{5cm} | C{2cm} | C{2.5cm} | C{5cm} |}
+  \captionsetup{justification=centering}\caption{} \\
   \hline
   Назва/ресурс & Тип & Платформа & Особливості \\
   \hline
@@ -176,6 +188,7 @@
 ~\newline
 \subsubsection{Реалізації на PC}
 \small\begin{longtable}{| C{3.5cm} | C{4cm} | C{1.8cm} | C{5.2cm} |}
+  \captionsetup{justification=centering}\caption{} \\
   \hline
   Назва/ресурс & Тип & Платформа & Особливості \\
   \hline
@@ -198,23 +211,34 @@
   \hline
 \end{longtable}\normalsize
 
+\newpage
 \subsection{Постановка задачі}
 
 \subsubsection{Призначення розробки}
 
-Тренувально-ігрова система “Memspacer” призначена для виконання таких процесів:
+Тренувальна система “Memspacer” призначена для:
 
 \begin{itemize}
-  \item Тренування короткочасної памяті;
-  \item Тренування здатності до концентрації уваги;
-  \item Тренування рухливого інтелекту;
-  \item Збереження і відображення історії тренувань;
+  \item Тренування короткочасної пам'яті
+  \item Тренування здатності до концентрації уваги
+  \item Тренування рухливого інтелекту
+  \item Збереження і відображення історії тренувань
 \end{itemize}
 
-\subsubsection{Цілі та задачі розробки}
+\subsubsection{Цілі розробки}
 
 \begin{itemize}
-  \item Заміщення наявних реалізацій класичного варіанту вправи та її мікромодифікацій, що не надають можливість впровадження до процесу гри рухів у трьовимірному просторі;
-  \item Створення реалізації, що є кросплатформенною і підтримує найпоширеніщі операційні системи;
-  \item Досягнення ефективності і компактності системи за рахунок використання спеціалізованого під задачу движку, ефективної моделі пам'яті для ігрових об'єктів, та легковагового стеку бібліотек;
+  \item Впровадження варіанту вправи N-Back із трьовимірною дошкою
+  \item Впровадження просторових модифікацій вправи за допомогою трьовимірної дошки
+  \item Досягнення зручності, ефективності, компактності, і кросплатформовості системи
+\end{itemize}
+
+\subsubsection{Задачі розробки}
+
+\begin{itemize}
+  \item Створення інтерфейсу користувачу
+  \item Створення бази даних для історії тренувань
+  \item Створення спеціалізованого движку для ефективної реалізації вправи
+  \item Реалізація варіанту вправи на створеному движку
+  \item Інтеграція користувацького інтерфейсу, бази даних, та програми моделювання
 \end{itemize}

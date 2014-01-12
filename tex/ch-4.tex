@@ -1,4 +1,4 @@
-\section{Програмне та техніче забезпечення}
+\section{Програмне та технічне забезпечення}
 \subsection{Засоби розробки}
 \subsubsection{Засоби розробки програми моделювання}
 \begin{itemize}[label=\Large$\diamond$]\itemsep1em
@@ -431,11 +431,11 @@ Sequential<Target> комбінує два ефекти у новий ланцю
   & Встановлює реакцію \emph{action} на сигнал \emph{signal} віджету \emph{widget} \\
   \hline
   ``MemspacerUI.hs'' \newline columnInserter \newline treeView model
-  & TreeView -> ListStore s -> ColumnInserter s
+  & TreeView \newline $\to$ ListStore s $\to$ ColumnInserter s
   & Створює фабрику колонок для даного дерева та моделі \\
   \hline
   ``MemspacerUI.hs'' \newline initHistory \newline historyTV
-  & TreeView -> IO (ListStore Session)
+  & TreeView $\to$ IO (ListStore Session)
   & Ініціалізує дерево \emph{historyTV} для відображення історії тренувань,
   створює, прив'язує до дерева, і повертає необхідну модель даних \\
   \hline
@@ -445,7 +445,7 @@ Sequential<Target> комбінує два ефекти у новий ланцю
   \hline
   ``MemspacerUI.hs'' \newline memspacerUI \newline
   initialConfig initialProfilesList
-  & (Key Config, Config) -> [String] -> IO ()
+  & (Key Config, Config) $\to$ [String] $\to$ IO ()
   & Ініціалізує інтерфейс конфігурування і перегляду історії
   з заданими початковою конфігурацією та початковим списком профілів \\
   \hline

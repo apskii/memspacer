@@ -1,4 +1,4 @@
-\documentclass[russian,ukrainian,utf8,simple]{eskdtext}
+\documentclass[russian,ukrainian,utf8,simple,vpadding=14mm]{eskdtext}
 \usepackage[hyphens]{url}
 \usepackage{array}
 \usepackage{graphicx}
@@ -7,20 +7,31 @@
 \usepackage{underscore}
 \usepackage{fontspec}
 \usepackage{enumitem}
-\setlist{parsep=4pt,listparindent=\parindent}
-% \usepackage{xunicode}
+\usepackage{eskdtotal}
+\usepackage{caption}
+\usepackage{amsmath}
+\usepackage{svg}
 \usepackage{xecyr}
-% \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
+\usepackage[section]{placeins}
+\makeatletter
+\AtBeginDocument{%
+  \expandafter\renewcommand\expandafter\subsection\expandafter{%
+    \expandafter\@fb@secFB\subsection
+  }%
+}
+\makeatother
+\setlist{parsep=4pt,listparindent=\parindent}
 \defaultfontfeatures{Ligatures=TeX}
-\setromanfont{Charis SIL}
+\setromanfont{Times New Roman}
 \setsansfont{Liberation Sans}
 \setmonofont{DejaVu Sans Mono}
 % \usepackage[babel=true]{microtype}
 % \ESKDdepartment{1111}
 % \ESKDcompany{2222}
 % \ESKDclassCode{3333}
+\ESKDputOnStyle{formIIab}{columnxxvi}{\ESKDdrawColumnXXVI}
 \ESKDtitle{Моделювання просторового варіанту задачі N-Back}
 % \ESKDdocName{44444}
 \ESKDsignature{КПІ ЗІС-9124}
@@ -30,13 +41,19 @@
 % \ESKDtitleDesignedBy{}{555}
 % \ESKDtitleDesignedBy{Руководитель разработки}{Лист~А.~А}
 \ESKDstyle{formIIab}
+\ESKDsectAlign{section}{Center}
 \renewcommand{\ESKDcolumnVIIname}{Арк.}
 \renewcommand{\labelitemi}{$\bullet$}
 \newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\makeatletter
+\gdef\LTno{??}
+\AtEndDocument{\immediate\write\@auxout{\gdef\string\LTno{\theLT@tables}}}
+\makeatother
 \begin{document}
 \sloppy
 %\maketitle
 \tableofcontents
+\include{./abstract}
 \include{./ch-1} % загальні положення
 \include{./ch-2} % інформаційне забезпечення
 \include{./ch-3} % математичне забезпечення
