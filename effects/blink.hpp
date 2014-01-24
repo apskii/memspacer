@@ -4,23 +4,22 @@
 #include "../core/effect.hpp"
 #include "../effect/algebra.hpp"
 
-/*
 namespace effects {
     TPL(Colored) struct Blink : public core::Effect<Colored> {
         float duration;
+        // float remaining;
         const Vec4 color;
         Blink(float duration, Vec4 color)
             : duration(duration)
             , color(color)
         {}
-        virtual void update(const Colored&, float delta) {
-            duration -= delta;
-        }
-        virt is_expired() const -> bool {
-            return duration <= 0;
-        }
-        virtual void apply(Colored& obj, float delta) const {
-            obj.color = (color - obj.color) * delta / duration;
+        virtual bool process(Colored& target, float delta) {
+            target.color += (color - target.color) * delta / duration;
+            if ((duration -= delta) <= 0) {
+                target.color = color;
+                return true;
+            }
+            return false;
         }
     };
 
@@ -29,7 +28,7 @@ namespace effects {
         CHECK_EFFECT(Blink, Blink<DummyColored>);
     }
 
-    TPL(Colored) func blink(float duration, Vec4 color, Pool& pool) -> effect::WrapEffectTerm<Colored> {
+    TPL(Colored) effect::WrapEffectTerm<Colored> blink(float duration, Vec4 color, Pool& pool) {
         return effect::WrapEffectTerm<Colored>(new (pool.malloc()) Blink<Colored>(duration, color));
     }
-}*/
+}

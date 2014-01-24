@@ -33,7 +33,6 @@ namespace core {
                 }
                 else {
                     it = effects.erase(it);
-                    effect->free(pool);
                     pool.free(effect);
                 }
             }

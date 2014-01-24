@@ -7,9 +7,8 @@
 namespace game_objects {
     class Cube : public core::GameObjectTemplate<Cube> {
     typedef Cell<Cube> C;
-    private:
-        C cells[3][3][3];
     public:
+        C cells[3][3][3];
         float cell_size;
         float cell_interval;
         Cube(Vec3 position = Vec3(0), Quat orientation = glm::angleAxis(0.f, 0.f, 0.f, 1.f))

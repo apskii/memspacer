@@ -37,7 +37,7 @@ namespace game_objects {
     public:
         Vec4 color;
         Cell() {}
-        Cell(Owner* parent, Vec3 position, Quat orientation, Vec4 color = Vec4(1.f, 0.f, 0.f, 1.f))
+        Cell(Owner* parent, Vec3 position, Quat orientation, Vec4 color = Vec4(1.0f, 0.0f, 0.5f, 0.f))
             : core::GameObjectTemplate<Cell<Owner>>(position, orientation)
             , parent(parent)
             , color(color)

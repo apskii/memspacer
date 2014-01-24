@@ -1,0 +1,623 @@
+\ESKDappendix{}{ТЕКСТИ ПРОГРАМНОГО КОДУ}
+\newpage
+\begin{lstlisting}[caption=defs.hpp]
+#pragma once
+
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtx/transform.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/quaternion.hpp>
+
+#define BOOST_DISABLE_THREADS
+#include <boost/pool/pool.hpp>
+
+typedef glm::vec3 Vec3;
+typedef glm::vec4 Vec4;
+typedef glm::quat Quat;
+typedef glm::mat3 Mat3;
+typedef glm::mat4 Mat4;
+
+typedef boost::pool<> Pool;
+
+#define TPL(A)     template<typename A>
+#define TPL_2(A,B) template<typename A, typename B>
+\end{lstlisting}
+
+\begin{lstlisting}[caption=effect.hpp]
+#pragma once
+
+#include <type_traits>
+#include "defs.hpp"
+
+namespace core {
+    TPL(T) struct Effect {
+        virtual void free(Pool&);
+        virtual bool process(T&, float);
+    };
+
+    TPL(E) struct CheckEffect {
+        static_assert(sizeof(E) <= 32,
+            "Effect subclasses should have sizeof <= 32 to fit into object pools."
+        );
+    };
+}
+
+#define CHECK_EFFECT(NAME, TYPE) struct NAME ## Checker : public core::CheckEffect<TYPE> {}
+\end{lstlisting}
+
+\begin{lstlisting}[caption=game_object.hpp]
+#pragma once
+
+#include <list>
+#include "defs.hpp"
+#include "effect.hpp"
+
+namespace core {
+    struct GameObject {
+        Vec3 position;
+        Quat orientation;
+        GameObject() {}
+        GameObject(Vec3 position, Quat orientation)
+            : position(position), orientation(orientation)
+        {}
+        virtual void update(float, Pool&)         = 0;
+        virtual void render(const RenderContext&) = 0;
+    };
+
+    TPL(Self) class GameObjectTemplate : public GameObject {
+    public:
+        GameObjectTemplate() {}
+        GameObjectTemplate(Vec3 position, Quat orientation)
+            : GameObject(position, orientation)
+        {}
+        virtual void render(const RenderContext&) = 0;
+        virtual void update(float delta, Pool& pool) {
+            auto it = std::begin(effects);
+            auto end = std::end(effects);
+            while (it != end) {
+                auto effect = *it;
+                if (!effect->process(*((Self*) this), delta)) {
+                    ++it;
+                }
+                else {
+                    it = effects.erase(it);
+                    effect->free(pool);
+                    pool.free(effect);
+                }
+            }
+        }
+        void attach_effect(Effect<Self>* effect) {
+            effects.push_back(effect);
+        }
+    private:
+        std::list<Effect<Self>*> effects;
+    };
+}
+\end{lstlisting}
+
+\begin{lstlisting}[caption=shader.hpp]
+#include <utility>
+#include <string>
+#include <fstream>
+#include <sstream>
+#include "defs.hpp"
+
+namespace core {
+    class Shader {
+    public:
+        typedef std::initializer_list < std::pair < GLenum, std::string > > Initializer;
+        Shader(Initializer descriptions)
+            : shader_program(glCreateProgram())
+        {
+            for (auto& pair : descriptions)
+                glAttachShader(shader_program, load(pair.first, pair.second));
+            glLinkProgram(shader_program);
+        }
+        inline void use() const { glUseProgram(shader_program); }
+    protected:
+        const GLuint shader_program;
+    private:
+        GLuint load(GLenum shader_type, std::string file_path) {
+            using namespace std;
+            ifstream ifs(file_path);
+            stringstream buffer;
+            buffer << ifs.rdbuf();
+            auto  string = buffer.str();
+            auto* source = string.c_str();
+            auto  shader = glCreateShader(shader_type);
+            glShaderSource(shader, 1, &source, nullptr);
+            glCompileShader(shader);
+	    GLint log_length;
+	    glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &log_length);
+	    GLchar* log = new GLchar[log_length + 1];
+	    glGetShaderInfoLog(shader, log_length, NULL, log);
+	    cerr << log << endl;
+	    delete[] log;
+            return shader;
+        }
+    };
+}
+\end{lstlisting}
+
+\begin{lstlisting}[caption=render_context.hpp]
+#pragma once
+
+#include "defs.hpp"
+#include "../shaders/default.hpp"
+#include "../shaders/star_nest.hpp"
+
+namespace core {
+    struct RenderContext {
+        shaders::Default default_shader;
+        shaders::StarNest star_nest_shader;
+        Mat4 view, proj;
+        float global_time;
+        RenderContext(const Mat4& view, const Mat4& proj)
+            : default_shader({
+                { GL_VERTEX_SHADER, "./default.v.glsl" },
+                { GL_FRAGMENT_SHADER, "./default.f.glsl" }
+            })
+            , star_nest_shader({
+                { GL_VERTEX_SHADER, "./star_nest.v.glsl" },
+                { GL_FRAGMENT_SHADER, "./star_nest.f.glsl" }
+            })
+            , view(view)
+            , proj(proj)
+            , global_time(0.f)
+        {}
+    };
+}
+\end{lstlisting}
+
+\begin{lstlisting}[caption=configuration.hpp]
+#pragma once
+#include<vector>
+#include<string>
+
+namespace core {
+  Configuration parse_configuration(const std::vector<std::string>& args) {
+    Configuration cfg { 0, 1, false, false, false, false, 0, 0, 1, 1};
+    for (const std::string& s : args) {
+      if (s == "-dm") { cfg.mode = 0; }
+      else if (s == "-sm") { cfg.mode = 1; }
+      else if (s == "-z") { cfg.useZRot = true; }
+      else if (s == "-c") { cfg.useColor = true; }
+      else if (s == "-s") { cfg.useSound = true; }
+        // ...
+      }
+    }
+    return cfg;
+  }
+}
+\end{lstlisting}
+
+\begin{lstlisting}[caption=effect/algebra.hpp]
+#pragma once
+
+#include <utility>
+#include "../core/defs.hpp"
+#include "../core/effect.hpp"
+#include "sequential.hpp"
+#include "parallel.hpp"
+
+namespace effect {
+    using core::Effect;
+
+    TPL_2(ET1, ET2) struct SeqEffectTerm;
+    TPL_2(ET1, ET2) struct ParEffectTerm;
+
+    TPL(Self) struct EffectTerm {
+        TPL(ET) inline SeqEffectTerm<Self, ET> operator>>(ET other) {
+            return SeqEffectTerm<Self, ET>(*((Self*) this), other);
+        }
+        TPL(ET) inline ParEffectTerm<Self, ET> operator||(ET other) {
+            return ParEffectTerm<Self, ET>(*((Self*) this), other);
+        }
+    };
+
+    TPL(T) struct WrapEffectTerm : public EffectTerm<WrapEffectTerm<T>> {
+	typedef T EffectTarget;
+        Effect<T>* effect;
+        WrapEffectTerm(Effect<T>* effect)
+            : effect(effect)
+        {}
+        inline Effect<T>* eval(Pool&) {
+            return effect;
+        }
+    };
+
+    TPL_2(ET1, ET2) struct SeqEffectTerm
+        : public EffectTerm<SeqEffectTerm<ET1, ET2>>
+    {
+	typedef typename ET1::EffectTarget EffectTarget;
+	ET1 first;
+	ET2 second;
+        SeqEffectTerm(ET1 first, ET2 second)
+            : first(first)
+	    , second(second)
+        {}
+        inline Effect<EffectTarget>* eval(Pool& pool) {
+            return new (pool.malloc()) Sequential<EffectTarget>(*first.eval(pool), *second.eval(pool));
+        }
+    };
+
+    TPL_2(ET1, ET2) struct ParEffectTerm
+        : public EffectTerm<ParEffectTerm<ET1, ET2>>
+    {
+	typedef typename ET1::EffectTarget EffectTarget;
+	ET1 first;
+	ET2 second;
+        ParEffectTerm(ET1 first, ET2 second)
+            : first(first)
+	    , second(second)
+        {}
+        inline Effect<EffectTarget>* eval(Pool& pool) {
+            return new (pool.malloc()) Parallel<EffectTarget>(*first.eval(pool), *second.eval(pool));
+        }
+    };
+}
+\end{lstlisting}
+
+\begin{lstlisting}[caption=effect/parallel.hpp]
+#pragma once
+
+#include "../core/defs.hpp"
+#include "../core/effect.hpp"
+
+namespace effect {
+    using core::Effect;
+
+    TPL(T) class Parallel : public Effect<T> {
+    private:
+        Effect<T>& first;
+        Effect<T>& second;
+        bool first_done;
+    public:
+        Parallel(Effect<T>& first, Effect<T>& second)
+            : first(first)
+            , second(second)
+            , first_done(false)
+        {}
+        virtual void free(Pool& pool) {
+            pool.free(&first);
+            pool.free(&second);
+        }
+        virtual bool process(T& target, float delta) {
+            if (!first_done) {
+                if (first.process(target, delta))
+                    first_done = true;
+            }
+            return second.process(target, delta) && first_done;
+        }
+    };
+}
+\end{lstlisting}
+
+\begin{lstlisting}[caption=effect/sequential.hpp]
+#pragma once
+
+#include "../core/defs.hpp"
+#include "../core/effect.hpp"
+
+namespace effect {
+    using core::Effect;
+
+    TPL(T) class Sequential : public Effect<T> {
+    private:
+        Effect<T>& first;
+        Effect<T>& second;
+        bool first_done;
+    public:
+        Sequential(Effect<T>& first, Effect<T>& second)
+            : first(first)
+            , second(second)
+            , first_done(false)
+        {}
+        virtual void free(Pool& pool) {
+            pool.free(&first);
+            pool.free(&second);
+        }
+        virtual bool process(T& target, float delta) {
+            if (!first_done) {
+                if (first.process(target, delta))
+                    first_done = true;
+                return false;
+            }
+            else {
+                return second.process(target, delta);
+            }
+        }
+    };
+}
+\end{lstlisting}
+
+\begin{lstlisting}[language=Haskell,caption=MemspacerUI.hs]
+{-# LANGUAGE TypeFamilies, GADTs, FlexibleContexts, RecordWildCards, RankNTypes,
+             QuasiQuotes, TemplateHaskell, OverloadedStrings, LambdaCase #-}
+
+module Main where
+
+import BindUI
+
+import Data.Char
+import Data.List (intercalate, elemIndex)
+import Data.Time
+import Data.Default
+import Data.Maybe
+import Data.IORef
+
+import Text.Read
+
+import Control.Monad.IO.Class (liftIO)
+import Control.Applicative
+import Control.Monad
+import Control.Lens
+
+import Database.Persist as P
+import Database.Persist.Sqlite as P
+import Database.Persist.TH as P
+
+import Graphics.UI.Gtk as G
+import Graphics.UI.Gtk.Glade as G
+
+import System.Exit
+
+(<:=) = writeIORef
+(<:<) ref mval = writeIORef ref =<< mval
+
+share [ mkPersist sqlSettings
+      , mkMigrate "migrateAll" ]
+  [persistLowerCase|
+    Global
+      key String
+      val String
+    Config
+      profile    String
+      mode       Int
+      buffLen    Int
+      useZRot    Bool
+      useColor   Bool
+      useSound   Bool
+      useSpaceBg Bool
+      idleColor  Int
+      blinkColor Int
+      blinkTime  Int
+      interval   Int
+      deriving Show
+    Session
+      pid  ConfigId
+      date UTCTime
+      rightAnswers  Int
+      wrongAnswers  Int
+      missedAnswers Int
+      deriving Show
+  |]
+
+makeLensesFor (map (\nm@(c:cs) -> ("config" ++ toUpper c : cs, nm))
+                 [ "profile", "mode", "buffLen", "useZRot"
+                 , "useColor", "useSound", "useSpaceBg"
+                 , "idleColor" , "blinkColor", "blinkTime", "interval" ])
+  ''ConfigGeneric
+
+makeLensesFor (map (\nm@(c:cs) -> ("session" ++ toUpper c : cs, nm))
+                 [ "pid", "date", "rightAnswers"
+                 , "wrongAnswers", "missedAnswers" ])
+  ''SessionGeneric
+
+instance Default (ConfigGeneric backend) where
+  def = Config "default" 0 1 False False False False 0 0 1 3
+
+cmdArgs :: Config -> String
+cmdArgs Config{..} = intercalate " "
+  [ if configMode == 0 then "-dm" else "-sm"
+  , "-n=" ++ show configBuffLen
+  , if configUseZRot then "-z" else ""
+  , if configUseColor then "-c" else ""
+  , if configUseSound then "-s" else ""
+  , if configUseSpaceBg then "-bg" else ""
+  , "-ic=" ++ show configIdleColor
+  , "-bc=" ++ show configBlinkColor
+  , "-bt=" ++ show configBlinkTime
+  , "-it=" ++ show configInterval ]
+
+activeProfile :: SqlPersistM String
+activeProfile =
+  selectFirst [GlobalKey ==. "active_profile"] [] >>= \case
+    Just (Entity _ (Global _ profile)) -> return profile
+    Nothing -> do
+      insert $ Global "active_profile" "default"
+      return "default"
+
+configFor :: String -> SqlPersistM (Key Config, Config)
+configFor profile =
+  selectFirst [ConfigProfile ==. profile] [] >>= \case
+    Just (Entity key cfg) -> return (key, cfg)
+    Nothing -> do
+      let cfg :: ConfigGeneric backend
+          cfg = def { configProfile = profile }
+      (,) <$> insert cfg <*> pure cfg
+
+activeConfig = configFor =<< activeProfile
+
+db = runSqlite "mspc.db"
+
+whenM :: Monad m => m Bool -> m () -> m ()
+whenM mb action = mb >>= \b -> when b action
+
+toolButtonClicked :: Signal ToolButton (IO ())
+toolButtonClicked = Signal $ \_ -> onToolButtonClicked
+
+(~$) widget signal action = on widget signal (action widget)
+
+data AddProfileDialog = AddProfileDialog
+  { addProfileW  :: Window
+  , okB, cancelB :: Button
+  , profileNameE :: Entry }
+
+data MainWindow = MainWindow
+  { mainW                             :: Window
+  , defaultModeRB, shiftingModeRB     :: RadioButton
+  , buffLenE, blinkTimeE, intervalE   :: Entry
+  , zRotCB, colorCB, soundCB, spaceCB :: CheckButton
+  , addTB, saveTB, revertTB           :: ToolButton
+  , runB, exitB                       :: Button
+  , profileCBX                        :: ComboBox
+  , historyTV                         :: TreeView }
+
+newtype ColumnInserter s = ColumnInserter
+  (Show a => String -> Getting a s a -> IO Int)
+
+columnInserter :: TreeView -> ListStore s -> ColumnInserter s
+columnInserter treeView model = ColumnInserter $ \title lens -> do
+  column <- treeViewColumnNew
+  treeViewColumnSetTitle column title
+  renderer <- cellRendererTextNew
+  cellLayoutPackStart column renderer False
+  cellLayoutSetAttributes column renderer model $ \entry ->
+    [cellText := show (entry ^. lens)]
+  treeViewAppendColumn treeView column
+
+initHistory historyTV = do
+  sessions <- listStoreNew []
+  treeViewSetModel historyTV sessions
+  treeViewSetHeadersVisible historyTV True
+  let ColumnInserter addCol = columnInserter historyTV sessions
+  addCol "Дата" date
+  addCol "Вірні відповіді" rightAnswers
+  addCol "Невірні відповіді" wrongAnswers
+  addCol "Пропущені відповіді" missedAnswers
+  return sessions
+
+addProfileDialog :: IO (IO (Maybe String))
+addProfileDialog = do
+  AddProfileDialog{..} <- $(bind ''AddProfileDialog "add-profile.glade")
+  let close = widgetHideAll addProfileW >> mainQuit
+  result <- newIORef Nothing
+  okB ~$ buttonActivated $ \_ -> do
+    profileName <- entryGetText profileNameE
+    result <:= Just profileName
+    close
+  cancelB ~$ buttonActivated $ \_ -> result <:= Nothing >> close
+  addProfileW ~$ deleteEvent $ \_ -> liftIO close >> return True
+  return $ do
+    widgetShowAll addProfileW
+    mainGUI
+    readIORef result
+
+memspacerUI initialConfig initialProfilesList = do
+  MainWindow{..} <- $(bind ''MainWindow "main.glade")
+  config   <- newIORef initialConfig
+  profiles <- newIORef initialProfilesList
+  sessions <- initHistory historyTV
+  askProfileName <- addProfileDialog
+  let
+    getConfig :: Getting a (ConfigGeneric SqlBackend) a -> IO a
+    getConfig lens = (^. lens) . snd <$> readIORef config
+    setConfig = modifyIORef config . fmap
+    initUI = do
+      cbItems <- comboBoxSetModelText profileCBX
+      mapM_ (listStoreAppend cbItems) initialProfilesList
+      curProfile <- getConfig profile
+      comboBoxSetActive profileCBX $ fromJust $
+        elemIndex curProfile initialProfilesList
+    resetUI = do
+      toggleButtonSetActive defaultModeRB =<< (== 0) <$> getConfig mode
+      toggleButtonSetActive shiftingModeRB =<< (== 1) <$> getConfig mode
+      entrySetText buffLenE =<< show <$> getConfig buffLen
+      toggleButtonSetActive zRotCB =<< getConfig useZRot
+      toggleButtonSetActive colorCB =<< getConfig useColor
+      toggleButtonSetActive soundCB =<< getConfig useSound
+      toggleButtonSetActive spaceCB =<< getConfig useSpaceBg
+      entrySetText blinkTimeE =<< show <$> getConfig blinkTime
+      entrySetText intervalE =<< show <$> getConfig interval
+    switchProfile profileName = do
+      config <:< db (configFor profileName)
+      resetUI
+  initUI
+  resetUI
+  G.set mainW [windowTitle := "Memspacer UI"]
+  mainW `onDestroy` mainQuit
+  defaultModeRB ~$ toggled $
+    \b -> whenM (toggleButtonGetActive b) $ setConfig (mode .~ 0)
+  shiftingModeRB ~$ toggled $
+    \b -> whenM (toggleButtonGetActive b) $ setConfig (mode .~ 1)
+  buffLenE ~$ editableChanged $
+    \e -> entryGetText e >>= \val -> setConfig (buffLen .~ maybe 1 id (readMaybe val))
+  zRotCB ~$ toggled $
+    \b -> toggleButtonGetActive b >>= \tog -> setConfig (useZRot .~ tog)
+  colorCB ~$ toggled $
+    \b -> toggleButtonGetActive b >>= \tog -> setConfig (useColor .~ tog)
+  soundCB ~$ toggled $
+    \b -> toggleButtonGetActive b >>= \tog -> setConfig (useSound .~ tog)
+  spaceCB ~$ toggled $
+    \b -> toggleButtonGetActive b >>= \tog -> setConfig (useSpaceBg .~ tog)
+  blinkTimeE ~$ editableChanged $
+    \e -> entryGetText e >>= \val -> setConfig (blinkTime .~ maybe 1 id (readMaybe val))
+  intervalE ~$ editableChanged $
+    \e -> entryGetText e >>= \val -> setConfig (interval .~ maybe 1 id (readMaybe val))
+  profileCBX ~$ changed $
+    \_ -> switchProfile . fromJust =<< comboBoxGetActiveText profileCBX
+  addTB ~$ toolButtonClicked $
+    \_ -> askProfileName >>= maybe (return ()) switchProfile
+  saveTB ~$ toolButtonClicked $
+    \_ -> db =<< uncurry replace <$> readIORef config
+  revertTB ~$ toolButtonClicked $
+    \_ -> (config <:< db activeConfig) >> resetUI
+  runB ~$ buttonActivated $
+    \_ -> putStrLn =<< cmdArgs . snd <$> readIORef config
+  exitB ~$ buttonActivated $
+    \_ -> exitSuccess
+  widgetShowAll mainW
+
+main = do
+  (config, profiles) <- db $ do
+    runMigration migrateAll
+    (,) <$> activeConfig
+        <*> (map (configProfile . entityVal) <$> selectList [] [])
+  initGUI
+  memspacerUI config profiles
+  mainGUI
+\end{lstlisting}
+
+\begin{lstlisting}[language=Haskell,caption=BindUI.hs]
+{-# LANGUAGE TemplateHaskell #-}
+
+module BindUI where
+
+import Graphics.UI.Gtk
+import Graphics.UI.Gtk.Glade
+import Text.Printf
+import Language.Haskell.TH
+
+unQ = mkName . nameBase
+
+nameLit = stringE . nameBase
+
+recFields (TyConI (DataD _ _ _ (ctor:_) _)) = conFields ctor
+recFields _                                 = []
+
+conFields (RecC _ fields) = map (\(nm,_,ty) -> (unQ nm,ty)) fields
+conFields _               = []
+
+castFor (ConT nm) = varE $ case nameBase nm of
+  "Window"      -> 'castToWindow
+  "Button"      -> 'castToButton
+  "RadioButton" -> 'castToRadioButton
+  "CheckButton" -> 'castToCheckButton
+  "ToolButton"  -> 'castToToolButton
+  "Entry"       -> 'castToEntry
+  "ComboBox"    -> 'castToComboBox
+  "TreeView"    -> 'castToTreeView
+  _             -> error $ printf "typeNameToCastName: unsupported typename `%s'!" (show nm)
+
+bind tyNm file = do
+  fields <- fmap recFields (reify tyNm)
+  let bindF ui (nm,ty) = bindS (varP nm)
+        [| xmlGetWidget $ui $(castFor ty) $(nameLit nm) |]
+      binds ui = map (bindF ui) fields
+      ctorApp = [| return $(foldl appE (conE $ unQ tyNm) (map (varE . fst) fields)) |]
+  [| do Just ui <- xmlNew $(stringE file)
+        $(doE (binds [|ui|] ++ [noBindS ctorApp])) |]
+\end{lstlisting}

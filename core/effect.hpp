@@ -5,12 +5,12 @@
 
 namespace core {
     TPL(T) struct Effect {
-        virtual void free(Pool&);
-        virtual bool process(T&, float);
+        // virtual void free(Pool&);
+        virtual bool process(T&, float) = 0;
     };
 
     TPL(E) struct CheckEffect {
-        static_assert(sizeof(E) <= 32,
+        static_assert(sizeof(E) <= 40,
             "Effect subclasses should have sizeof <= 32 to fit into object pools."
         );
     };

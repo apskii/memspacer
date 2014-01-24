@@ -1,4 +1,4 @@
-\documentclass[russian,ukrainian,utf8,simple,vpadding=14mm]{eskdtext}
+\documentclass[ukrainian,utf8,simple,vpadding=14mm]{eskdtext}
 \usepackage[hyphens]{url}
 \usepackage{array}
 \usepackage{graphicx}
@@ -10,18 +10,47 @@
 \usepackage{eskdtotal}
 \usepackage{caption}
 \usepackage{amsmath}
+\usepackage{listings}
+\lstset{language=C++,breaklines=true}
 \usepackage{svg}
 \usepackage{xecyr}
+\usepackage[ukrainian]{babel}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
+\usepackage{hyperref}
+\urlstyle{same}
+\usepackage{chngcntr}
+\counterwithin{figure}{section}
+\counterwithin{table}{section}
+\counterwithin{equation}{section}
+\usepackage{caption}
+\captionsetup[longtable]{margin=1.25cm}
 \usepackage[section]{placeins}
 \makeatletter
 \AtBeginDocument{%
-  \expandafter\renewcommand\expandafter\subsection\expandafter{%
-    \expandafter\@fb@secFB\subsection
+  \expandafter\renewcommand\expandafter\subsubsection\expandafter{%
+    \expandafter\@fb@secFB\subsubsection
   }%
 }
 \makeatother
+\makeatletter % subsection spacing
+  \let\origsubsection\subsection
+  \renewcommand\subsection{\@ifstar{\starsubsection}{\nostarsubsection}}
+  \newcommand\nostarsubsection[1]{\origsubsection{#1}\subsectionpostlude}
+  \newcommand\starsubsection[1]{\origsubsection*{#1}\subsectionpostlude}
+  \newcommand\subsectionpostlude{\vspace{18pt}}
+\makeatother
+\setlength{\parindent}{1.25cm}
+%\makeatletter % subsubsection spacing
+%  \let\origsubsubsection\subsubsection
+%  \renewcommand\subsubsection{\@ifstar{\starsubsubsection}{\nostarsubsubsection}}
+%  \newcommand\nostarsubsubsection[1]{\origsubsubsection{#1}\subsubsectionpostlude}
+%  \newcommand\starsubsubsection[1]{\origsubsubsection*{#1}\subsubsectionpostlude}
+%  \newcommand\subsubsectionpostlude{\vspace{18pt}}
+%\makeatother
+\ESKDcolumnXIfII{Олійник Ю.О.}
+\ESKDcolumnXIfV{Халус О.А.}
+\ESKDcolumnXIfVI{Олійник Ю.О.}
 \setlist{parsep=4pt,listparindent=\parindent}
 \defaultfontfeatures{Ligatures=TeX}
 \setromanfont{Times New Roman}
@@ -32,9 +61,9 @@
 % \ESKDcompany{2222}
 % \ESKDclassCode{3333}
 \ESKDputOnStyle{formIIab}{columnxxvi}{\ESKDdrawColumnXXVI}
-\ESKDtitle{Моделювання просторового варіанту задачі N-Back}
+\ESKDtitle{Комплекс задач роз- ширення функціональності тренажеру короткочасної пам’яті N-Back}
 % \ESKDdocName{44444}
-\ESKDsignature{КПІ ЗІС-9124}
+\ESKDsignature{КПІ ЗІС-9124.1105/2с.ПЗ}
 \ESKDauthor{Поліщук А.С.}
 % \ESKDtitleApprovedBy{Руководитель разработки}{333}
 % \ESKDtitleAgreedBy{Руководитель разработки}{444}
@@ -43,7 +72,16 @@
 \ESKDstyle{formIIab}
 \ESKDsectAlign{section}{Center}
 \renewcommand{\ESKDcolumnVIIname}{Арк.}
-\renewcommand{\labelitemi}{$\bullet$}
+% \renewcommand{\labelitem}{$\dash$}
+% \renewcommand{\labelitemi}{$\bullet$}
+\AddEnumerateCounter{\asbuk}{\@asbuk}{\cyrm}
+\renewcommand{\theenumi}{\asbuk{enumi}}
+\renewcommand{\theenumii}{\arabic{enumii}}
+\addto\captionsukrainian{
+  \renewcommand{\contentsname}{ЗМІСТ}
+  \renewcommand{\refname}{ПЕРЕЛІК ПОСИЛАНЬ}
+  \renewcommand{\appendixname}{ДОДАТОК}
+}
 \newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
 \makeatletter
 \gdef\LTno{??}
@@ -52,8 +90,9 @@
 \begin{document}
 \sloppy
 %\maketitle
-\tableofcontents
 \include{./abstract}
+\tableofcontents
+\include{./ch-0} % вступ
 \include{./ch-1} % загальні положення
 \include{./ch-2} % інформаційне забезпечення
 \include{./ch-3} % математичне забезпечення
@@ -62,8 +101,5 @@
 \include{./ch-6} % розділ з охорони праці
 \include{./ch-7} % загальні висновки
 \include{./bib}  % бібліографія
-\ESKDappendix{}{Технічне завдання}
-TZ
-\ESKDappendix{}{Тексти програмного коду}
-SRC
+\include{./src}  % додаток: тексти програмного коду
 \end{document}

@@ -1,5 +1,5 @@
-#include "core/game.hpp"
 #include "core/configuration.hpp"
+#include "core/game.hpp"
 #include <vector>
 
 int main(int argc, char** argv) {
